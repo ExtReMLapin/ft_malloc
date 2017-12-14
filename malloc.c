@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2017/12/14 13:50:15 by pfichepo         ###   ########.fr       */
+/*   Updated: 2017/12/14 14:45:13 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,19 @@ static void* find_freespace(t_plage *plage, size_t wanted)
 	while (curmalloc->next) // searching for free space between already existings mallocs
 	{
 		if ((size_t)(curmalloc->end+1 - curmalloc->next ) > wanted) // find the first good place, not scanning the whole plages
+		{
+			printf("Found free space in the plage %p at %p\n",(void*)plage, curmalloc->end + 1);
 			return (curmalloc->end + 1);
+		}
 		curmalloc = curmalloc->next;
 	}	
 
 	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
+	{
+		printf("Found free space at the end of the plage %p at %p\n",(void*)plage, curmalloc->end + 1);
 		return (curmalloc->end + 1);
+	}
+	printf("Found no free space in plage %p\n", (void*)plage);
 	return (NULL);
 }
 
@@ -69,6 +76,12 @@ static void* find_free_space_plages(t_plage *plage, size_t wanted)
 	void	*target;
 	t_plage *plagebrowse;
 
+	if (plage == NULL)
+	{
+		printf("%s\n","REEEEEE PLAGE IS NULL, ABORTING" );
+		return (NULL);
+	}
+
 	found = false;
 	plagebrowse = plage;
 	while (plagebrowse)
@@ -76,15 +89,23 @@ static void* find_free_space_plages(t_plage *plage, size_t wanted)
 		target = find_freespace(plagebrowse, wanted);
 		if (target != NULL)
 		{
+			printf("Found space at %p\n", target);
 			found = true;
 			break;
 		}
-		plagebrowse = plagebrowse->next;
+		printf("%s\n", "Next plage....");
+		if (plagebrowse->next)
+			plagebrowse = plagebrowse->next;
+		else
+			break;
 	}
 	if (!found)
 	{
+		printf("Found no page with free space, creating a new one with size %zu", plagebrowse->size);
 		plagebrowse->next = ezmmap(plagebrowse->size);
+		printf("%s", "..");
 		init_page(plagebrowse->next, plagebrowse->size);
+		printf("%s", "done!\n");
 		return (&(plagebrowse->next->data));
 	}
 	else
@@ -112,6 +133,7 @@ void *_malloc(size_t size)
 		return NULL;
 	if (size < MAX_TINY_SIZE)
 	{
+		printf("%s\n", "Using Small page");
 		target = alc_mng.small_plage;
 	}
 	else if (size < MAX_MED_SIZE)
@@ -137,6 +159,8 @@ int main(void)
 	printf("%p\n", &alc_mng.small_plage);
 	printf("%p\n", &alc_mng.med_plage);
 	printf("%p\n", alc_mng.med_plage);
+	printf("%p\n", _malloc(5));
+
 
 	return 0;
 }
