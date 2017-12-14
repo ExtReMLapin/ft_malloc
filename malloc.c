@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2017/12/14 13:46:26 by pfichepo         ###   ########.fr       */
+/*   Updated: 2017/12/14 13:50:15 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static void* find_freespace(t_plage *plage, size_t wanted)
 	curmalloc = plage->data;
 	while (curmalloc->next) // searching for free space between already existings mallocs
 	{
-		if ((curmalloc->end+1 - curmalloc->next ) > wanted) // find the first good place, not scanning the whole plages
+		if ((size_t)(curmalloc->end+1 - curmalloc->next ) > wanted) // find the first good place, not scanning the whole plages
 			return (curmalloc->end + 1);
 		curmalloc = curmalloc->next;
 	}	
