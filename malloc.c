@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2017/12/14 14:45:13 by pfichepo         ###   ########.fr       */
+/*   Updated: 2017/12/14 15:09:38 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void *_malloc(size_t size)
 	t_plage	*target;
 	void 	*adr;
 	if (size == 0)
-		return NULL;
+		return (NULL);
 	if (size < MAX_TINY_SIZE)
 	{
 		printf("%s\n", "Using Small page");
@@ -147,6 +147,49 @@ void *_malloc(size_t size)
 }
 
 
+t_malloc *find_malloc_in(void *ptr, t_plage *plage)
+{
+	t_plage *plagebrowse;
+	if (plage == NULL)
+	{
+		printf("%s\n","REEEEEE PLAGE IS NULL, ABORTING" );
+		return (NULL);
+	}
+	plagebrowse = plage;
+	t_malloc *mal;
+	
+	while (plagebrowse)
+	{
+		printf("Started searching for ptr %p in plage %p \n",ptr, plage);
+		mal = plagebrowse->data;
+		while (mal)
+		{
+			if (mal->data == ptr)
+			{
+				printf("Found ptr %p in plage %p in malloc %p\n",ptr, plage, mal );
+				return (mal);
+			}
+			mal = mal->next;
+		}
+		if (plagebrowse->next)
+			plagebrowse = plagebrowse->next;
+		else
+			break;
+	}
+
+	return (NULL);
+}
+
+
+t_malloc	*find_malloc(void *ptr)
+{
+	if (ptr == NULL)
+		return (NULL);
+
+
+
+}
+
 int main(void)
 {
 	void *page = ezmmap(page_size(false) + page_size(true));
@@ -159,7 +202,7 @@ int main(void)
 	printf("%p\n", &alc_mng.small_plage);
 	printf("%p\n", &alc_mng.med_plage);
 	printf("%p\n", alc_mng.med_plage);
-	printf("%p\n", _malloc(5));
+	void *bite = _malloc(5);
 
 
 	return 0;
