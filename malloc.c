@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2017/12/15 12:55:04 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/08 10:52:31 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ static void init_page(t_plage *plage, size_t size)
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
-	plage->max_allowed_alloc = plage + size;
-	printf("%lu size is %lu\n",plage->max_allowed_alloc - (void*)plage , size);
+	plage->max_allowed_alloc = (void*)plage + (uintptr_t)size;
+	printf("%lu size is %lu\n",(void*)plage->max_allowed_alloc - (void*)plage , size);
 }
 
 
@@ -52,8 +52,8 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	t_malloc *mlc;
 
 	mlc = (t_malloc*)ptr;
-	mlc->end = &mlc->data + size;
-	mlc->data = &mlc->data;
+	mlc->end = &(mlc->data) + size;
+	mlc->data = &(mlc->data);
 	mlc->next = NULL;
 
 	return mlc;
@@ -68,6 +68,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		return NULL;
 	if (plage->data == NULL)
 	{
+		printf("%s\n", "Creating malloc at the start of the place");
 		plage->data = init_malloc(&plage->data+1, wanted - sizeof(t_malloc));
 		t_malloc	*mal = (t_malloc*)(plage->data);
 		printf("First malloc of plage %p with data at %p | data next is %p\n",plage, plage->data, mal->next);
@@ -95,8 +96,8 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
 		tmp = curmalloc->end + 1;
-		printf("%p\n",plage->max_allowed_alloc);
-		printf("Found free space at the end of the plage %p at %p free space is : %lu \n",(void*)plage, curmalloc->end + 1, (size_t)plage->max_allowed_alloc - ((size_t)tmp + (size_t)wanted));
+		printf("Max allowed malloc %p\n",plage->max_allowed_alloc);
+		printf("Found free space at the end of the plage %p at %p free space will be : %lu \n",(void*)plage, curmalloc->end + 1, (size_t)plage->max_allowed_alloc - ((size_t)tmp + (size_t)wanted));
 		
 		curmalloc->next = tmp;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
@@ -171,7 +172,10 @@ void *_malloc(size_t size)
 		target = alc_mng.small_plage;
 	}
 	else if (size < MAX_MED_SIZE)
+	{
+		printf("%s\n", "Using Med page");
 		target = alc_mng.med_plage;
+	}
 	else
 		target = NULL;
 	adr = find_free_space_plages(target, size + sizeof(t_malloc));
@@ -252,9 +256,9 @@ int main(void)
 	//printf("Page med %p size is %lu last possible mal is %p data pos is %p \n",alc_mng.med_plage, alc_mng.med_plage->size,  alc_mng.med_plage->max_allowed_alloc, &alc_mng.med_plage->data );
 
 	int i = 0;
-	while (i < 5 )
+	while (i < 700 )
 	{
-		_malloc(1);
+		_malloc(15);
 		i++;
 	}
 
