@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/08 12:41:27 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/08 12:47:28 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 			tmp->next = curmalloc->next;
 			curmalloc->next = tmp;
 			printf("Found free space in the plage %p at %p\n free space is %lu bits and we need only %lu\n",(void*)plage, tmp, (size_t)(curmalloc->next - curmalloc->end+1 ), wanted);
-			return (tmp);
+			return (tmp->data);
 		}
 		curmalloc = curmalloc->next;
 	}	
@@ -104,7 +104,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		
 		curmalloc->next = tmp;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
-		return (tmp);
+		return (tmp->data);
 	}
 	printf("Found no free space in plage %p\n", (void*)plage);
 	return (NULL);
@@ -273,8 +273,9 @@ int main(void)
 
 
 	void *cu = _malloc(1);
-
-	void* ca = find_malloc(cu);
+	void *ce = _malloc(1);
+	void *cc = _malloc(1);
+	void* ca = find_malloc(ce);
 
 
 	printf("found malloc in plage %p\n",ca);
