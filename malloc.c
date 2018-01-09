@@ -6,14 +6,14 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/08 12:47:28 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/09 09:24:58 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
 #include <stdio.h>
 
-//mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
+
 
 	
 static unsigned long int page_size(bool big)
@@ -36,7 +36,7 @@ static void *ezmmap(unsigned long int size)
 
 static void init_page(t_plage *plage, size_t size)
 {
-	printf("init page with size %lu\n", size);
+	//printf("init page with size %lu\n", size);
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
@@ -56,7 +56,6 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	mlc->end = &(mlc->data) + size;
 	mlc->data = &(mlc->data);
 	mlc->next = NULL;
-	printf("data is %p\n", mlc->data);
 
 	return mlc;
 }
@@ -70,12 +69,12 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		return NULL;
 	if (plage->data == NULL)
 	{
-		printf("%s\n", "Creating malloc at the start of the place");
+		printf("%s\n", "Creating malloc at the start of the plage");
 		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
-		printf("plage->data->next = %p\n", plage->data->next);
 		t_malloc	*mal = (t_malloc*)(plage->data);
-		printf("First malloc of plage %p with data at %p | data next is %p\n",plage, plage->data, mal->next);
-		return (plage->data->data);
+		printf("First malloc of plage %p with data at %p\n",plage, mal->data);
+		mal->past = NULL;
+		return (mal->data);
 	}
 	curmalloc = plage->data;
 	while (curmalloc && curmalloc->next) // searching for free space between already existings mallocs
@@ -89,6 +88,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 			init_malloc( tmp, wanted - sizeof(t_malloc));
 
 			tmp->next = curmalloc->next;
+			tmp->next->past = tmp;
 			curmalloc->next = tmp;
 			printf("Found free space in the plage %p at %p\n free space is %lu bits and we need only %lu\n",(void*)plage, tmp, (size_t)(curmalloc->next - curmalloc->end+1 ), wanted);
 			return (tmp->data);
@@ -103,6 +103,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		printf("Found free space at the end of the plage %p at %p free space will be : %lu \n",(void*)plage, curmalloc->end + 1, (size_t)plage->max_allowed_alloc - ((size_t)tmp + (size_t)wanted));
 		
 		curmalloc->next = tmp;
+		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
 		return (tmp->data);
 	}
@@ -222,7 +223,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 			}
 			else
 			{
-				printf("didn't find it, looking for %p, got %p eek %p\n",ptr, mal->data, mal  );
+				printf("didn't find it, looking for %p, got %p\n",ptr, mal->data );
 			}
 			mal = mal->next;
 		}
@@ -248,9 +249,7 @@ t_malloc	*find_malloc(void *ptr)
 	malfind = find_malloc_in(ptr,alc_mng.med_plage);
 	if (malfind)
 		return (malfind);
-
-
-return NULL;
+	return NULL;
 }
 
 
@@ -272,22 +271,14 @@ int main(void)
 	}*/
 
 
-	void *cu = _malloc(1);
-	void *ce = _malloc(1);
-	void *cc = _malloc(1);
-	void* ca = find_malloc(ce);
-
-
-	printf("found malloc in plage %p\n",ca);
-
 
 
 	
 
 
-	/*void *bite = _malloc(5);
+	void *bite = _malloc(5);
 
-	printf("Malloc address of %p is %p \n",bite, find_malloc_in(bite, alc_mng.small_plage) );*/
+
 
 	return 0;
 }

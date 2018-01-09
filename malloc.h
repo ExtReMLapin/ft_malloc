@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:49:33 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/08 11:28:22 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/08 13:05:38 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,14 @@
 
 # define MAX_TINY_SIZE 	8
 # define TINY_PAGE_SIZE (getpagesize())
-# define MAX_MED_SIZE 	64
+# define MAX_MED_SIZE 	128
 # define MED_PAGE_SIZE 	(8 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 
 typedef struct			s_malloc
 {
+	void				*past;
 	void 				*next;
 	void 				*end;
 	void 				*data;
