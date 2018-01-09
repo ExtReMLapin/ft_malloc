@@ -33,6 +33,7 @@ static void *ezmmap(unsigned long int size)
 
 static void init_page(t_plage *plage, size_t size)
 {
+	printf("New plage at : %p\n", plage);
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
@@ -43,7 +44,7 @@ static void init_page(t_plage *plage, size_t size)
 t_malloc *init_malloc(void* ptr, size_t size)
 {
 	t_malloc *mlc;
-
+	printf("New malloc at %p\n", ptr);
 	if (ptr == NULL)
 		return NULL;
 	mlc = (t_malloc*)ptr;
@@ -177,6 +178,35 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 }
 
 
+t_retplgmlc find_mallocandplage(void *ptr)
+{
+	t_retplgmlc ret;
+	t_malloc *malfind;
+
+
+	ret.plage = NULL;
+	ret.mlc = NULL;
+	if (ptr == NULL)
+		return (ret); 
+	malfind = find_malloc_in(ptr, alc_mng.small_plage);
+	if (malfind)
+	{
+		ret.plage = alc_mng.small_plage;
+		ret.mlc = malfind;
+		return (ret);
+	}
+	malfind = find_malloc_in(ptr, alc_mng.med_plage);
+	if (malfind)
+	{
+		ret.plage = alc_mng.med_plage;
+		ret.mlc = malfind;
+		return (ret);
+	}
+	
+	return (ret);
+}
+
+
 void checkpage(void)
 {
 	void *page;
@@ -213,59 +243,59 @@ void *_malloc(size_t size)
 
 void _free(void *ptr)
 {
-	t_malloc *malfind;
-	t_plage *plage;
-	if (ptr == NULL)
-		return; 
-	plage = NULL;
-	malfind = find_malloc_in(ptr, alc_mng.small_plage);
-	if (malfind)
-		plage = alc_mng.small_plage;
-	if (malfind == NULL)
-	{
-		malfind = find_malloc_in(ptr, alc_mng.med_plage);
-		if (malfind)
-			plage = alc_mng.med_plage;
-	}
-	if (plage == NULL)
+	t_retplgmlc data;
+
+	data = find_mallocandplage(ptr);
+	if (data.plage == NULL)
 		return;
-	t_malloc *mlc = malfind;
-	if (mlc == NULL)
-		printf("%s %p\n", "could not free", ptr);
-	if (mlc->past == NULL && mlc->next == NULL)
+	if (data.mlc->past == NULL && data.mlc->next == NULL)
+		data.plage->data = NULL; // todo : free plage is empty
+	else if (data.mlc->past == NULL)
 	{
-		plage->data = NULL; // todo : free plage is empty
+		data.mlc->next->past = NULL;
+		data.plage->data = data.mlc->next;
 	}
-	else if (mlc->past == NULL)
-	{
-		mlc->next->past = NULL;
-		plage->data = mlc->next;
-	}
-	else if (mlc->next == NULL)
-	{
-		mlc->past->next = NULL;
-	}
+	else if (data.mlc->next == NULL)
+		data.mlc->past->next = NULL;
 	else
 	{
-		mlc->past->next = mlc->next;
-		mlc->next->past = mlc->past;
-		mlc->next = NULL;
+		data.mlc->past->next = data.mlc->next;
+		data.mlc->next->past = data.mlc->past;
+		data.mlc->next = NULL;
 	}
 }
 
 
+/*void *realloc(void *ptr, size_t size)
+{
+
+
+}*/
+
+
 int main(void)
 {
-	printf("%p %p\n", alc_mng.small_plage, alc_mng.med_plage);
 
 
-	ezmmap(page_size(false) + page_size(true));
-	/*alc_mng.small_plage = (t_plage*)page;
+
+	void* page = ezmmap(page_size(false) + page_size(true));
+	alc_mng.small_plage = (t_plage*)page;
 	init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
 	alc_mng.med_plage = (t_plage*)(page + page_size(false));
-	init_page(alc_mng.med_plage, MED_PAGE_SIZE);*/
+	init_page(alc_mng.med_plage, MED_PAGE_SIZE);
 
+	void* dada;
 
+	int i = 0;
+
+	while (i < 500)
+	{
+		dada = _malloc(52);
+		i++;
+		//_free(dada);
+	}
+		_free(dada);
+		_malloc(52);
 
 	return 0;
 }

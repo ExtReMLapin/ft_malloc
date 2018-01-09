@@ -32,7 +32,8 @@ typedef struct			s_malloc
 	struct s_malloc		*next;
 	void 				*end;
 	void 				*data;
-}	t_malloc;
+}						t_malloc;
+
 
 
 typedef struct			s_plage
@@ -41,7 +42,14 @@ typedef struct			s_plage
 	void				*max_allowed_alloc;
 	struct s_plage		*next;
 	t_malloc			*data;
-}	t_plage;
+}						t_plage;
+
+typedef struct s_retplgmlc
+{
+	t_plage 	*plage;
+	t_malloc 	*mlc;	
+}				t_retplgmlc;
+
 
 typedef struct			s_plage_mng
 {
