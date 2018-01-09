@@ -28,8 +28,8 @@
 
 typedef struct			s_malloc
 {
-	void				*past;
-	void 				*next;
+	struct s_malloc		*past;
+	struct s_malloc		*next;
 	void 				*end;
 	void 				*data;
 }	t_malloc;
