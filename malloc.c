@@ -13,9 +13,6 @@
 #include "malloc.h"
 #include <stdio.h>
 
-
-
-	
 static unsigned long int page_size(bool big)
 {
 	unsigned int i;
@@ -36,7 +33,6 @@ static void *ezmmap(unsigned long int size)
 
 static void init_page(t_plage *plage, size_t size)
 {
-	//printf("init page with size %lu\n", size);
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
@@ -46,12 +42,10 @@ static void init_page(t_plage *plage, size_t size)
 
 t_malloc *init_malloc(void* ptr, size_t size)
 {
-	if (ptr == NULL)
-		return NULL;
-
-	printf("new malloc at adr %p\n", ptr);
 	t_malloc *mlc;
 
+	if (ptr == NULL)
+		return NULL;
 	mlc = (t_malloc*)ptr;
 	mlc->end = &(mlc->data) + size;
 	mlc->data = &(mlc->data);
@@ -69,10 +63,8 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		return NULL;
 	if (plage->data == NULL)
 	{
-		printf("%s\n", "Creating malloc at the start of the plage");
 		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
 		t_malloc	*mal = (t_malloc*)(plage->data);
-		printf("First malloc of plage %p with data at %p\n",plage, mal->data);
 		mal->past = NULL;
 		return (mal->data);
 	}
@@ -81,16 +73,11 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	{
 		if ((size_t)((void*)curmalloc->next - curmalloc->end + sizeof(int) ) > wanted) // find the first good place, not scanning the whole plages
 		{
-			printf("Got %p that ends at %p and next starts at %p\n", curmalloc, curmalloc->end, curmalloc->next);
-
-
 			tmp = curmalloc->end + 1;
 			init_malloc( tmp, wanted - sizeof(t_malloc));
-
 			tmp->next = curmalloc->next;
 			tmp->next->past = tmp;
 			curmalloc->next = tmp;
-			printf("Found free space in the plage %p at %p\n free space is %lu bits and we need only %lu\n",(void*)plage, tmp, (size_t)((void*)curmalloc->next - curmalloc->end+1 ), wanted);
 			return (tmp->data);
 		}
 		curmalloc = curmalloc->next;
@@ -98,16 +85,12 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 
 	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
-		tmp = curmalloc->end + 1;
-		printf("Max allowed malloc %p\n",plage->max_allowed_alloc);
-		printf("Found free space at the end of the plage %p at %p free space will be : %lu \n",(void*)plage, curmalloc->end + 1, (size_t)plage->max_allowed_alloc - ((size_t)tmp + (size_t)wanted));
-		
+		tmp = curmalloc->end + 1;		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
 		return (tmp->data);
 	}
-	printf("Found no free space in plage %p\n", (void*)plage);
 	return (NULL);
 }
 
@@ -142,11 +125,8 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 	}
 	if (!found)
 	{
-		printf("Found no page with free space, creating a new one with size %zu", plagebrowse->size);
 		plagebrowse->next = ezmmap(plagebrowse->size);
-		printf("%s", " .. ");
 		init_page(plagebrowse->next, plagebrowse->size);
-		printf("%s", "done!\n");
 		init_malloc(&plagebrowse->next->data + 1, wanted - sizeof(t_malloc));
 		return (plagebrowse->next->data);
 	}
@@ -158,31 +138,7 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 
 
 
-void *_malloc(size_t size)
-{
-	t_plage		*target;
-	t_malloc 	*adr;
-	if (size == 0)
-		return (NULL);
-	if (size < MAX_TINY_SIZE)
-	{
-		printf("%s\n", "Using Small page");
-		target = alc_mng.small_plage;
-	}
-	else if (size < MAX_MED_SIZE)
-	{
-		printf("%s\n", "Using Med page");
-		target = alc_mng.med_plage;
-	}
-	else
-		target = NULL;
-	adr = find_free_space_plages(target, size + sizeof(t_malloc));
-	if (adr != NULL)
-	{
-		return (adr);
-	}
-	return (NULL);	
-}
+
 
 
 void printmalloc(t_malloc *mal)
@@ -204,20 +160,12 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 	t_malloc *mal;
 	while (plagebrowse)
 	{
-		printf("Started searching for ptr %p in plage %p \n",ptr, plage);
 		mal = plagebrowse->data;
 
 		while (mal)
 		{
 			if (mal->data == ptr)
-			{
-				printf("dFound ptr %p in plage %p in malloc %p\n",ptr, plage, mal );
 				return (mal);
-			}
-			else
-			{
-				printf("didn't find it, looking for %p, got %p\n",ptr, mal->data );
-			}
 			mal = mal->next;
 		}
 		if (plagebrowse->next)
@@ -229,7 +177,38 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 }
 
 
+void checkpage(void)
+{
+	void *page;
+	if (alc_mng.small_plage == NULL || alc_mng.med_plage)
+	{
+		page = ezmmap(page_size(false) + page_size(true));
+		alc_mng.small_plage = (t_plage*)page;
+		init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
+		alc_mng.med_plage = (t_plage*)(page + page_size(false));
+		init_page(alc_mng.med_plage, MED_PAGE_SIZE);
+	}
+}
 
+
+void *_malloc(size_t size)
+{
+	t_plage		*target;
+	t_malloc 	*adr;
+
+	if (size == 0)
+		return (NULL);
+	if (size < MAX_TINY_SIZE)
+		target = alc_mng.small_plage;
+	else if (size < MAX_MED_SIZE)
+		target = alc_mng.med_plage;
+	else
+		target = NULL;
+	adr = find_free_space_plages(target, size + sizeof(t_malloc));
+	if (adr != NULL)
+		return (adr);
+	return (NULL);	
+}
 
 
 void _free(void *ptr)
@@ -277,21 +256,14 @@ void _free(void *ptr)
 
 int main(void)
 {
-	void *page = ezmmap(page_size(false) + page_size(true));
-	alc_mng.small_plage = (t_plage*)page;
+	printf("%p %p\n", alc_mng.small_plage, alc_mng.med_plage);
+
+
+	ezmmap(page_size(false) + page_size(true));
+	/*alc_mng.small_plage = (t_plage*)page;
 	init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
 	alc_mng.med_plage = (t_plage*)(page + page_size(false));
-	init_page(alc_mng.med_plage, MED_PAGE_SIZE);
-	//printf("Page med %p size is %lu last possible mal is %p data pos is %p \n",alc_mng.med_plage, alc_mng.med_plage->size,  alc_mng.med_plage->max_allowed_alloc, &alc_mng.med_plage->data );
-
-
-	_malloc(54);
-	void* td = _malloc(54);
-	_free(td);
-	_malloc(54);
-	_malloc(54);
-
-
+	init_page(alc_mng.med_plage, MED_PAGE_SIZE);*/
 
 
 
