@@ -19,10 +19,10 @@
 # include <errno.h>
 # include <stdbool.h>
 
-# define MAX_TINY_SIZE 	8
-# define TINY_PAGE_SIZE (getpagesize())
+# define MAX_TINY_SIZE 	32
+# define TINY_PAGE_SIZE (128 * getpagesize())
 # define MAX_MED_SIZE 	128
-# define MED_PAGE_SIZE 	(8 * getpagesize())
+# define MED_PAGE_SIZE 	(1024 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 
@@ -44,17 +44,26 @@ typedef struct			s_plage
 	t_malloc			*data;
 }						t_plage;
 
-typedef struct s_retplgmlc
+typedef struct			s_cplage
 {
-	t_plage 	*plage;
-	t_malloc 	*mlc;	
-}				t_retplgmlc;
+	size_t				size;
+	struct s_cplage		*next;
+	void				*data;
+}						t_cplage;
+
+
+
+typedef struct 			s_retplgmlc
+{
+	t_plage 			*plage;
+	t_malloc 			*mlc;	
+}						t_retplgmlc;
 
 
 typedef struct			s_plage_mng
 {
-	struct s_plage		*small_plage;
-	struct s_plage		*med_plage;
+	t_plage				*small_plage;
+	t_plage				*med_plage;
 }	t_plage_mng;
 
 t_plage_mng				alc_mng;

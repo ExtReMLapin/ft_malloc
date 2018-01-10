@@ -16,12 +16,10 @@
 static unsigned long int page_size(bool big)
 {
 	unsigned int i;
-
-	i = sizeof(t_plage);
 	if (big)
-		i += MED_PAGE_SIZE;
+		i = MED_PAGE_SIZE;
 	else
-		i += TINY_PAGE_SIZE;
+		i = TINY_PAGE_SIZE;
 	return (i);
 }
 
@@ -114,11 +112,9 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 		target = find_freespace(plagebrowse, wanted);
 		if (target != NULL)
 		{
-			//printf("Found space at %p\n", target);
 			found = true;
 			break;
 		}
-		//printf("%s\n", "Next plage....");
 		if (plagebrowse->next)
 			plagebrowse = plagebrowse->next;
 		else
@@ -153,23 +149,22 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 	t_plage *plagebrowse;
 
 	if (plage == NULL || ptr == NULL)
-	{
-		printf("%s\n","REEEEEE PLAGE IS NULL, ABORTING" );
 		return (NULL);
-	}
 	plagebrowse = plage;
 	t_malloc *mal;
 	while (plagebrowse)
 	{
-		mal = plagebrowse->data;
-
-		while (mal)
+		if (ptr > (void*)plagebrowse->data && ptr < plagebrowse->max_allowed_alloc)
 		{
-			if (mal->data == ptr)
-				return (mal);
-			mal = mal->next;
+			mal = plagebrowse->data;
+			while (mal)
+			{
+				if (mal->data == ptr)
+					return (mal);
+				mal = mal->next;
+			}
 		}
-		if (plagebrowse->next)
+		else if (plagebrowse->next)
 			plagebrowse = plagebrowse->next;
 		else
 			break;
@@ -207,15 +202,18 @@ t_retplgmlc find_mallocandplage(void *ptr)
 }
 
 
-void checkpage(void)
+void checkpage(size_t size)
 {
-	void *page;
-	if (alc_mng.small_plage == NULL || alc_mng.med_plage)
+	if (size < MAX_TINY_SIZE && alc_mng.small_plage == NULL)
 	{
-		page = ezmmap(page_size(false) + page_size(true));
-		alc_mng.small_plage = (t_plage*)page;
+		printf("%s\n", "small page");
+		alc_mng.small_plage = (t_plage*)ezmmap(page_size(false));
 		init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
-		alc_mng.med_plage = (t_plage*)(page + page_size(false));
+	}
+	else if (size < MAX_MED_SIZE && alc_mng.med_plage == NULL)
+	{
+		printf("%s\n", "med page");
+		alc_mng.med_plage = (t_plage*)ezmmap(page_size(true));
 		init_page(alc_mng.med_plage, MED_PAGE_SIZE);
 	}
 }
@@ -228,6 +226,7 @@ void *_malloc(size_t size)
 
 	if (size == 0)
 		return (NULL);
+	checkpage(size);
 	if (size < MAX_TINY_SIZE)
 		target = alc_mng.small_plage;
 	else if (size < MAX_MED_SIZE)
@@ -273,29 +272,20 @@ void _free(void *ptr)
 }*/
 
 
+
 int main(void)
 {
+	
 
-
-
-	void* page = ezmmap(page_size(false) + page_size(true));
-	alc_mng.small_plage = (t_plage*)page;
-	init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
-	alc_mng.med_plage = (t_plage*)(page + page_size(false));
-	init_page(alc_mng.med_plage, MED_PAGE_SIZE);
-
+	int i = 1;
 	void* dada;
-
-	int i = 0;
-
-	while (i < 500)
+	while (i < 5 )
 	{
 		dada = _malloc(52);
-		i++;
-		//_free(dada);
-	}
+	 
 		_free(dada);
-		_malloc(52);
+		i++;
+	}
 
 	return 0;
 }
