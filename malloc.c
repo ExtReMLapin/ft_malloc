@@ -23,7 +23,6 @@ static unsigned long int page_size(bool big)
 	return (i);
 }
 
-
 static void *ezmmap(unsigned long int size)
 {
 	return mmap(0, size, PROT, MAP, -1, 0);
@@ -37,7 +36,6 @@ static void init_page(t_plage *plage, size_t size)
 	plage->size = size;
 	plage->max_allowed_alloc = (void*)plage + (uintptr_t)size;
 }
-
 
 t_malloc *init_malloc(void* ptr, size_t size)
 {
@@ -158,6 +156,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 					return (mal);
 				mal = mal->next;
 			}
+			return (NULL);
 		}
 		else if (plagebrowse->next)
 			plagebrowse = plagebrowse->next;
@@ -172,11 +171,10 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	t_retplgmlc ret;
 	t_malloc *malfind;
 
-
 	ret.plage = NULL;
 	ret.mlc = NULL;
 	if (ptr == NULL)
-		return (ret); 
+		return (ret);
 	malfind = find_malloc_in(ptr, alc_mng.small_plage);
 	if (malfind)
 	{
@@ -191,7 +189,6 @@ t_retplgmlc find_mallocandplage(void *ptr)
 		ret.mlc = malfind;
 		return (ret);
 	}
-	
 	return (ret);
 }
 
@@ -274,7 +271,7 @@ void	*ft_memcpy(void *s1, const void *s2, size_t n)
 
 
 
-void *realloc(void *ptr, size_t size)
+void *_realloc(void *ptr, size_t size)
 {
 	t_retplgmlc data;
 	t_malloc *newmlc;
@@ -289,7 +286,7 @@ void *realloc(void *ptr, size_t size)
 			data.mlc->end = data.mlc->data + size;
 			return (ptr); 
 		}
-		else
+		else // no freespace after it so we just realoc it
 		{
 			newmlc = find_free_space_plages(data.plage, size);
 			ft_memcpy(newmlc->data, ptr, data.mlc->end - ptr);
@@ -329,5 +326,8 @@ int main(void)
 		_free(dada);
 		i++;
 	}
+	printf("%p\n", dada);
+
+	_realloc(dada, 100);
 	return 0;
 }
