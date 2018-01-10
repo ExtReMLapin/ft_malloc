@@ -59,7 +59,10 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	t_malloc *curmalloc;
 	t_malloc *tmp;
 	if (wanted > plage->size)
+	{
+		printf("%s\n", "REQUESTED SIZE IS BIGGER THAN THE PLAGE, THIS SHOULD NOT HAPPEN");
 		return NULL;
+	}
 	if (plage->data == NULL)
 	{
 		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
@@ -131,18 +134,10 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 		return (target);
 }
 
-
-
-
-
-
-
-
 void printmalloc(t_malloc *mal)
 {
 	printf("Malloc pos : %p next is %p  data is %p", mal, mal->next, mal->data);
 }
-
 
 t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 {
@@ -171,7 +166,6 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 	}
 	return (NULL);
 }
-
 
 t_retplgmlc find_mallocandplage(void *ptr)
 {
@@ -206,13 +200,11 @@ void checkpage(size_t size)
 {
 	if (size < MAX_TINY_SIZE && alc_mng.small_plage == NULL)
 	{
-		printf("%s\n", "small page");
 		alc_mng.small_plage = (t_plage*)ezmmap(page_size(false));
 		init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
 	}
 	else if (size < MAX_MED_SIZE && alc_mng.med_plage == NULL)
 	{
-		printf("%s\n", "med page");
 		alc_mng.med_plage = (t_plage*)ezmmap(page_size(true));
 		init_page(alc_mng.med_plage, MED_PAGE_SIZE);
 	}
@@ -239,7 +231,6 @@ void *_malloc(size_t size)
 	return (NULL);	
 }
 
-
 void _free(void *ptr)
 {
 	t_retplgmlc data;
@@ -248,7 +239,7 @@ void _free(void *ptr)
 	if (data.plage == NULL)
 		return;
 	if (data.mlc->past == NULL && data.mlc->next == NULL)
-		data.plage->data = NULL; // todo : free plage is empty
+		data.plage->data = NULL; // todo : free plage if empty
 	else if (data.mlc->past == NULL)
 	{
 		data.mlc->next->past = NULL;
@@ -265,29 +256,78 @@ void _free(void *ptr)
 }
 
 
-/*void *realloc(void *ptr, size_t size)
+void	*ft_memcpy(void *s1, const void *s2, size_t n)
 {
+	char	*c1;
+	char	*c2;
+
+	if (n == 0 || s1 == s2)
+		return (s1);
+	c1 = (char *)s1;
+	c2 = (char *)s2;
+	while (--n)
+		*c1++ = *c2++;
+	*c1 = *c2;
+	return (s1);
+}
 
 
-}*/
 
 
+void *realloc(void *ptr, size_t size)
+{
+	t_retplgmlc data;
+	t_malloc *newmlc;
+
+	data = find_mallocandplage(ptr);
+	if (data.plage == NULL)
+		return (NULL);
+	if (data.mlc->next != NULL)
+	{
+		if (((void*)data.mlc->next - 32 - ptr) >= (long)size)
+		{
+			data.mlc->end = data.mlc->data + size;
+			return (ptr); 
+		}
+		else
+		{
+			newmlc = find_free_space_plages(data.plage, size);
+			ft_memcpy(newmlc->data, ptr, data.mlc->end - ptr);
+			newmlc->end = newmlc->data + size;
+			data.mlc->past->next = newmlc;
+			data.mlc->next->past = newmlc;
+			return (newmlc->data);
+		}
+	}
+	else
+	{
+		if (data.plage->max_allowed_alloc > (ptr + size))
+		{
+			data.mlc->end = data.mlc->data + size;
+			return (ptr); 
+		}
+		else // no free space at the end
+		{
+			newmlc = find_free_space_plages(data.plage, size);
+			ft_memcpy(newmlc->data, ptr, data.mlc->end - ptr);
+			newmlc->end = newmlc->data + size;
+			data.mlc->past->next = newmlc;
+			return (newmlc->data);
+		}
+	}
+}
 
 int main(void)
 {
+	int i = 0;
 	
 
-	int i = 1;
 	void* dada;
 	while (i < 5 )
 	{
 		dada = _malloc(52);
-	 
 		_free(dada);
 		i++;
 	}
-
 	return 0;
 }
-
-

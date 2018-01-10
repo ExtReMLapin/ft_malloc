@@ -34,8 +34,6 @@ typedef struct			s_malloc
 	void 				*data;
 }						t_malloc;
 
-
-
 typedef struct			s_plage
 {
 	size_t				size;
@@ -51,8 +49,6 @@ typedef struct			s_cplage
 	void				*data;
 }						t_cplage;
 
-
-
 typedef struct 			s_retplgmlc
 {
 	t_plage 			*plage;
@@ -64,7 +60,8 @@ typedef struct			s_plage_mng
 {
 	t_plage				*small_plage;
 	t_plage				*med_plage;
-}	t_plage_mng;
+	t_plage				*big_plages;
+}						t_plage_mng;
 
 t_plage_mng				alc_mng;
 
