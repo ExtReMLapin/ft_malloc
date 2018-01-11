@@ -6,7 +6,7 @@
 /*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/11 13:32:12 by pierre           ###   ########.fr       */
+/*   Updated: 2018/01/11 13:42:47 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void init_page(t_plage *plage, size_t size)
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
-	plage->max_allowed_alloc = (void*)plage + size;
+	plage->max_allowed_alloc = (void*)plage + size * sizeof(char);
 }
 
 t_malloc *init_malloc(void* ptr, size_t size)
@@ -44,7 +44,7 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	if (ptr == NULL)
 		return NULL;
 	mlc = (t_malloc*)ptr;
-	mlc->end = &(mlc->data) + size;
+	mlc->end = &(mlc->data) + size * sizeof(char);
 	mlc->data = &(mlc->data);
 	mlc->next = NULL;
 
@@ -63,7 +63,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	}
 	if (plage->data == NULL)
 	{
-		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
+		plage->data = init_malloc(&plage->data + sizeof(char), wanted - sizeof(t_malloc));
 		t_malloc	*mal = (t_malloc*)(plage->data);
 		mal->past = NULL;
 		return (mal->data);
@@ -73,7 +73,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	{
 		if ((size_t)((void*)curmalloc->next - curmalloc->end + sizeof(int) ) > wanted) // find the first good place, not scanning the whole plages
 		{
-			tmp = curmalloc->end + 1;
+			tmp = curmalloc->end + sizeof(char);
 			init_malloc( tmp, wanted - sizeof(t_malloc));
 			tmp->next = curmalloc->next;
 			tmp->next->past = tmp;
@@ -85,7 +85,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 
 	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
-		tmp = curmalloc->end + 1;		
+		tmp = curmalloc->end + sizeof(char);		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
@@ -96,9 +96,9 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 
 static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 {
-	bool	found;
+	bool		found;
 	t_malloc	*target;
-	t_plage *plagebrowse;
+	t_plage 	*plagebrowse;
 
 	if (plage == NULL)
 	{
@@ -125,7 +125,7 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 	{
 		plagebrowse->next = ezmmap(plagebrowse->size);
 		init_page(plagebrowse->next, plagebrowse->size);
-		init_malloc(&plagebrowse->next->data + 1, wanted - sizeof(t_malloc));
+		init_malloc(&plagebrowse->next->data + sizeof(int), wanted - sizeof(t_malloc));
 		return (plagebrowse->next->data);
 	}
 	else
@@ -290,9 +290,9 @@ void *_realloc(void *ptr, size_t size)
 		return (NULL);
 	if (data.mlc->next != NULL)
 	{
-		if (((void*)data.mlc->next - 32 - ptr) >= (long)size)
+		if (((void*)data.mlc->next - sizeof(int) - ptr) >= (long)size)
 		{
-			data.mlc->end = data.mlc->data + size;
+			data.mlc->end = data.mlc->data + size * sizeof(char);
 			return (ptr); 
 		}
 		else // no freespace after it so we just realoc it
@@ -307,7 +307,7 @@ void *_realloc(void *ptr, size_t size)
 	}
 	else
 	{
-		if (data.plage->max_allowed_alloc > (ptr + size))
+		if (data.plage->max_allowed_alloc > (ptr + size * sizeof(char)))
 		{
 			data.mlc->end = data.mlc->data + size;
 			return (ptr); 
