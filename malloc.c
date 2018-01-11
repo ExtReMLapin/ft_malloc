@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   malloc.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/09 09:24:58 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/11 13:32:12 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void init_page(t_plage *plage, size_t size)
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
-	plage->max_allowed_alloc = (void*)plage + (uintptr_t)size;
+	plage->max_allowed_alloc = (void*)plage + size;
 }
 
 t_malloc *init_malloc(void* ptr, size_t size)
@@ -193,18 +193,27 @@ t_retplgmlc find_mallocandplage(void *ptr)
 }
 
 
-void checkpage(size_t size)
+t_plage *checkpage(size_t size)
 {
-	if (size < MAX_TINY_SIZE && alc_mng.small_plage == NULL)
+	if (size < MAX_TINY_SIZE)
 	{
-		alc_mng.small_plage = (t_plage*)ezmmap(page_size(false));
-		init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
+		if (alc_mng.small_plage == NULL)
+		{
+			alc_mng.small_plage = (t_plage*)ezmmap(page_size(false));
+			init_page(alc_mng.small_plage, TINY_PAGE_SIZE);
+		}
+		return (alc_mng.small_plage);
 	}
-	else if (size < MAX_MED_SIZE && alc_mng.med_plage == NULL)
+	else if (size < MAX_MED_SIZE)
 	{
-		alc_mng.med_plage = (t_plage*)ezmmap(page_size(true));
-		init_page(alc_mng.med_plage, MED_PAGE_SIZE);
+		if (alc_mng.med_plage == NULL)
+		{
+			alc_mng.med_plage = (t_plage*)ezmmap(page_size(true));
+			init_page(alc_mng.med_plage, MED_PAGE_SIZE);
+		}
+		return (alc_mng.med_plage);
 	}
+	return (NULL);
 }
 
 
