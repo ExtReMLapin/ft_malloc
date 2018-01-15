@@ -6,7 +6,7 @@
 /*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/12 14:04:30 by pierre           ###   ########.fr       */
+/*   Updated: 2018/01/15 13:24:33 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ static void *ezmmap(unsigned long int size)
 
 static void init_page(t_plage *plage, size_t size)
 {
-	printf("New plage at : %p\n", plage);
+	printf("New plage at : %p\nn\n\n\n\n\n", plage);
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->size = size;
-	plage->max_allowed_alloc = (void*)plage + size * sizeof(char);
+	plage->max_allowed_alloc = (void*)plage + size;
 }
 
 t_malloc *init_malloc(void* ptr, size_t size)
@@ -44,8 +44,8 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	if (ptr == NULL)
 		return NULL;
 	mlc = (t_malloc*)ptr;
-	mlc->end = &(mlc->data) + size * sizeof(char);
-	mlc->data = &(mlc->data) + sizeof(char);
+	mlc->end = &(mlc->data) + size;
+	mlc->data = &(mlc->data) + 1;
 	mlc->next = NULL;
 
 	return mlc;
@@ -63,7 +63,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	}
 	if (plage->data == NULL) // very first malloc of the plage
 	{
-		plage->data = init_malloc(&plage->data + sizeof(char), wanted - sizeof(t_malloc));
+		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
 		t_malloc	*mal = (t_malloc*)(plage->data);
 		mal->past = NULL;
 		return (mal->data);
@@ -71,9 +71,9 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	curmalloc = plage->data;
 	while (curmalloc && curmalloc->next) // searching for free space between already existings mallocs
 	{
-		if ((size_t)((void*)curmalloc->next - curmalloc->end + sizeof(char) ) > wanted) // find the first good place, not scanning the whole plages
+		if ((size_t)((void*)curmalloc->next - curmalloc->end + 1 ) > wanted) // find the first good place, not scanning the whole plages
 		{
-			tmp = curmalloc->end + sizeof(char);
+			tmp = curmalloc->end + 1;
 			init_malloc( tmp, wanted - sizeof(t_malloc));
 			tmp->next = curmalloc->next;
 			tmp->next->past = tmp;
@@ -83,14 +83,16 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		curmalloc = curmalloc->next;
 	}	
 
-	if ((curmalloc->end + sizeof(char) + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
+	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
-		tmp = curmalloc->end + sizeof(char);		
+		tmp = curmalloc->end + 1;		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
 		return (tmp->data);
 	}
+
+	printf("%p is bigger than %p\n",(curmalloc->end + 1 + wanted) ,plage->max_allowed_alloc  );
 	return (NULL);
 }
 
@@ -156,7 +158,6 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 			{
 				if (mal->data == ptr)
 					return (mal);
-				printf("found %p but looking for %p\n", mal->data, ptr);
 				mal = mal->next;
 			}
 			return (NULL);
@@ -198,7 +199,7 @@ t_retplgmlc find_mallocandplage(void *ptr)
 
 t_plage *checkpage(size_t size)
 {
-	if (size < MAX_TINY_SIZE)
+	if (size <= MAX_TINY_SIZE)
 	{
 		if (alc_mng.small_plage == NULL)
 		{
@@ -207,7 +208,7 @@ t_plage *checkpage(size_t size)
 		}
 		return (alc_mng.small_plage);
 	}
-	else if (size < MAX_MED_SIZE)
+	else if (size <= MAX_MED_SIZE)
 	{
 		if (alc_mng.med_plage == NULL)
 		{
@@ -228,9 +229,9 @@ void *_malloc(size_t size)
 	if (size == 0)
 		return (NULL);
 	checkpage(size);
-	if (size < MAX_TINY_SIZE)
+	if (size <= MAX_TINY_SIZE)
 		target = alc_mng.small_plage;
-	else if (size < MAX_MED_SIZE)
+	else if (size <= MAX_MED_SIZE)
 		target = alc_mng.med_plage;
 	else
 		target = NULL;
@@ -293,9 +294,9 @@ void *_realloc(void *ptr, size_t size)
 		return (NULL);
 	if (data.mlc->next != NULL)
 	{
-		if (((void*)data.mlc->next - sizeof(int) - ptr) >= (long)size)
+		if (((void*)data.mlc->next - sizeof(int) - ptr) >= (long)size) // place after it
 		{
-			data.mlc->end = data.mlc->data + size * sizeof(char);
+			data.mlc->end = data.mlc->data + size;
 			return (ptr); 
 		}
 		else // no freespace after it so we just realoc it
@@ -308,10 +309,11 @@ void *_realloc(void *ptr, size_t size)
 			return (newmlc->data);
 		}
 	}
-	else
+	else// nothing after it
 	{
-		if (data.plage->max_allowed_alloc > (ptr + size * sizeof(char)))
+		if (data.plage->max_allowed_alloc > (ptr + size))
 		{
+			printf("%p %p\n",data.plage->max_allowed_alloc, ptr + size );
 			data.mlc->end = data.mlc->data + size;
 			return (ptr); 
 		}
@@ -326,39 +328,29 @@ void *_realloc(void *ptr, size_t size)
 	}
 }
 
+
+// malloc ok
+// free ok
+// realloc ???
+
 int main(void)
 {
 
 
-	char* dada = (char*)_malloc(27*sizeof(char));
-	int i = 0 ;
-	while (i < 26)
+
+	void *dada;
+
+
+	int i = 0;
+
+	while (i < 9868)
 	{
-		dada[i] = 'a' + i;
+		//printf("%i\n", i);
+		dada = _malloc(50);
 		i++;
 	}
-	dada[i] = 0;
 
-
-	char* dada2 = _malloc(5*sizeof(char));
-	i = 0;
-	while (i < 4)
-	{
-		dada2[i] = '1' + i;
-		i++;
-	}
-	dada2[i] = 0;
-
-
-
-	t_retplgmlc dada1 = find_mallocandplage((void*)dada);
-	printmalloc(dada1.mlc);
-
-
-	t_retplgmlc dada22 = find_mallocandplage((void*)dada2);
-	printmalloc(dada22.mlc);
-
-	printf("%s %s\n", dada, dada2 );
+	//_realloc(dada, 360);
 
 	return 0;
 }
