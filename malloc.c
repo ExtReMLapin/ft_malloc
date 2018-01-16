@@ -6,7 +6,7 @@
 /*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/15 13:24:33 by pierre           ###   ########.fr       */
+/*   Updated: 2018/01/16 10:22:25 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,13 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	if (ptr == NULL)
 		return NULL;
 	mlc = (t_malloc*)ptr;
-	mlc->end = &(mlc->data) + size;
-	mlc->data = &(mlc->data) + 1;
-	mlc->next = NULL;
 
+	mlc->data = (void*)(&(mlc->data)) + 1;
+	mlc->end = (void*)(&(mlc->data)) + size + 1;
+
+	printf("%lu\n", mlc->end - ptr);
+
+	mlc->next = NULL;
 	return mlc;
 }
 
@@ -66,6 +69,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
 		t_malloc	*mal = (t_malloc*)(plage->data);
 		mal->past = NULL;
+
 		return (mal->data);
 	}
 	curmalloc = plage->data;
@@ -83,16 +87,20 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		curmalloc = curmalloc->next;
 	}	
 
-	if ((curmalloc->end + 1 + wanted) <= plage->max_allowed_alloc) // if nothing between allocs then put it at the end
+	if ((curmalloc->end + 1 + wanted) < plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
+
+		//printf("Free space before malloc : %lu \n", plage->max_allowed_alloc - (curmalloc->end + 1));
+
 		tmp = curmalloc->end + 1;		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
+		printf("took : %lu fro m%p to %p while we only asked %lu\n", tmp->end - curmalloc->end , curmalloc->end , tmp->end, wanted - sizeof(t_malloc) );
+		//printf("free space after malloc : %lu at %p \n", plage->max_allowed_alloc - tmp->end, tmp->end);
 		return (tmp->data);
 	}
-
-	printf("%p is bigger than %p\n",(curmalloc->end + 1 + wanted) ,plage->max_allowed_alloc  );
+	printf("last alloc end is at %p, free space before end is : %lu while we need space : %lu\n",curmalloc->end , plage->max_allowed_alloc - curmalloc->end, wanted );
 	return (NULL);
 }
 
@@ -313,7 +321,8 @@ void *_realloc(void *ptr, size_t size)
 	{
 		if (data.plage->max_allowed_alloc > (ptr + size))
 		{
-			printf("%p %p\n",data.plage->max_allowed_alloc, ptr + size );
+			printf("Free space : %lu\n",data.plage->max_allowed_alloc -  (ptr + size) );
+
 			data.mlc->end = data.mlc->data + size;
 			return (ptr); 
 		}
@@ -343,14 +352,14 @@ int main(void)
 
 	int i = 0;
 
-	while (i < 9868)
+	while (i < 9687)
 	{
 		//printf("%i\n", i);
 		dada = _malloc(50);
 		i++;
 	}
 
-	//_realloc(dada, 360);
+	_realloc(dada, 128);
 
 	return 0;
 }
