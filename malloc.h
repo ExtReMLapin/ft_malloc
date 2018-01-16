@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   malloc.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:49:33 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/08 13:05:38 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/16 10:25:43 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # define MAX_TINY_SIZE 	32
 # define TINY_PAGE_SIZE (128 * getpagesize())
 # define MAX_MED_SIZE 	128
-# define MED_PAGE_SIZE 	(1024 * getpagesize())
+# define MED_PAGE_SIZE 	(64 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 
