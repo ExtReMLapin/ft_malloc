@@ -6,7 +6,7 @@
 /*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:49:33 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/16 10:25:43 by pierre           ###   ########.fr       */
+/*   Updated: 2018/01/18 11:22:54 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <sys/mman.h>
 # include <errno.h>
 # include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 # define MAX_TINY_SIZE 	32
 # define TINY_PAGE_SIZE (128 * getpagesize())
