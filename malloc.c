@@ -52,7 +52,7 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	mlc->end = (void*)(&(mlc->data)) + size + 1;
 
 	mlc->next = NULL;
-	return mlc;
+	return (mlc);
 }
 
 
@@ -153,7 +153,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 {
 	t_plage *plagebrowse;
 
-	if (plage == NULL || ptr == NULL)
+	if (plage == NULL || !plage->data || ptr == NULL)
 		return (NULL);
 	plagebrowse = plage;
 	t_malloc *mal;
@@ -161,7 +161,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 	{
 		if (ptr > (void*)plagebrowse->data && ptr < plagebrowse->max_allowed_alloc)
 		{
-			printf("%s\n", "found plage");
+			printf("%s %p and %p ends %p\n", "found plage cuz malloc data is at ", ptr, (void*)plagebrowse->data, plagebrowse->max_allowed_alloc );
 			mal = plagebrowse->data;
 			while (mal)
 			{
@@ -169,7 +169,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 					return (mal);
 				mal = mal->next;
 			}
-			printf("%s\n", "wtf");
+			printf("%s\n", "wtf didnt find");
 			return (NULL);
 		}
 		else if (plagebrowse->next)
@@ -282,7 +282,6 @@ static void	*ft_memcpy(void *s1, const void *s2, size_t n)
 	printf("%p %p\n", s1, s2);
 	if (n == 0 || s1 == s2)
 		return (s1);
-	printf("%s\n", "memcpy rooo");
 	c1 = (char *)s1;
 	c2 = (char *)s2;
 	while (--n)
@@ -304,17 +303,12 @@ void *_realloc(void *ptr, size_t size)
 	t_malloc *newmlc;
 	t_plage *correctplage;
 
-	printf("%s\n", "21111");
 	correctplage = checkpage(size);
-	printf("%s\n", "21211");
 	data = find_mallocandplage(ptr);
-	printf("%s\n", "22222");
 	if (data.plage == NULL)
 		return (NULL);
-		printf("%s\n", "33333");
 	if (data.plage == correctplage)
 	{
-		printf("%s\n","correct plage" );
 		if (data.mlc->next != NULL)
 		{
 			if (((void*)data.mlc->next - sizeof(int) - ptr) >= (long)size) // place after it
@@ -354,11 +348,8 @@ void *_realloc(void *ptr, size_t size)
 	}
 	else
 	{
-		printf("roooo %p  \n",correctplage );
+
 		newmlc = find_free_space_plages(correctplage, size);
-		printf("%s\n", "dada");
-		printf("%p\n", newmlc);
-		printf("%p\n",newmlc->data );
 		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
 		//newmlc->end = newmlc->data + size;
 		if (data.mlc->next && data.mlc->past)
@@ -394,7 +385,7 @@ int main(void)
 
 	int i = 0;
 
-	while (i < 38)
+	while (i < 1)
 	{
 		//printf("%i\n", i);
 		dada = _malloc(120);
