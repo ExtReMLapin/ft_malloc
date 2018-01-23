@@ -284,10 +284,12 @@ void *special_custom_malloc(size_t size)
 	return (&plagebrowse->next->data + 1);
 }
 
+
 void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool gocustom)
 {
 	t_plage page;
 	t_malloc mlc;
+	void *mlc2;
 
 	if (incustom && gocustom)
 	{
@@ -296,44 +298,24 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 		else
 		{
 			page = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
-			if (incustom->past)
-				incustom->past->next = page;
-			if (incustom->next)
-				incustom->next->past = page;
 			init_page(page, closestsize(size + sizeof(t_plage) + 1), true);
 			ft_memcpy(&page->data + 1, &incustom->data + 1, mathmin(incustom->size, size));
-			munmap(incustom, incustom->size);
+			_free(ptr);
 			return (&page->data + 1);
 		}
 
 	}
 	else if(incustom) // custom plage -> pas custom plage
 	{
-		if (incustom->past && incustom->past)
-		{
-			incustom->past->next == incustom->next;
-			incustom->next->past = incustom->past;
-		}
-		else if (incustom->next) // rien avant
-		{
-			alc_mng.custom_plage = incustom->next;
-			incustom->past = NULL;
-		}
-		else if (incustom->past)
-			incustom->past->next = NULL;
-		else
-			alc_mng.custom_plage = NULL;
 		mlc = _malloc(size);
 		ft_memcpy(mlc, &incustom->data + 1, mathmin(incustom->size, size));
-		munmap(incustom, incustom->size);
+		_free(ptr);
 		return (mlc);
 	}
 	else // de data normal à custom;
 	{
-
-
-
-
+		mlc2 = _malloc(size);
+		ft_memcpy(mlc2, ptr, mathmin(data.mlc->end - ptr, size));
 	}
 
 
@@ -524,30 +506,7 @@ void *_realloc(void *ptr, size_t size)
 
 		newmlc = find_free_space_plages(correctplage, size);
 		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
-		//newmlc->end = newmlc->data + size;
-		if (data.mlc->next && data.mlc->past)
-		{
-			data.mlc->past->next = data.mlc->next;
-			data.mlc->next->past = data.mlc->past;
-		}
-		else if (data.mlc->next) // check la distance entre le start de la plage et le 1er malloc pour pas que y'ai un offset vide
-		{
-			data.plage->data = data.mlc->next; // temp fix
-		}
-		else if (data.mlc->past)
-		{
-			data.mlc->past->next = NULL;
-		}
-		else
-		{
-			if (data.plage == alc_mng.small_plage)
-				alc_mng.small_plage = NULL;
-			else if (data.plage == alc_mng.med_plage)
-				alc_mng.med_plage = NULL;
-
-		}
-		munmap(data.plage, data.plage->size);
-		
+		_free(ptr);
 		return (newmlc->data);
 
 	}
