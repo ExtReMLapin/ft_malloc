@@ -43,7 +43,7 @@ static size_t closestsize(size_t size)
 
 static void init_page(t_plage *plage, size_t size, bool custom)
 {
-	printf("New plage at : %p\n", plage);
+	printf("New plage at : %p with size = %lu\n", plage, size);
 	plage->data = NULL;
 	plage->next	= NULL;
 	plage->past = NULL;
@@ -240,7 +240,7 @@ t_plage *checkpage(size_t size)
 		if (alc_mng.custom_plage == NULL)
 		{
 			alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
-			init_page(alc_mng.custom_plage, closestsize(size), true);
+			init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + 1), true);
 		}
 		return (alc_mng.custom_plage);
 
@@ -283,14 +283,14 @@ bool iscustomsizeptr(void *ptr)
 	browse = alc_mng.custom_plage;
 	while (browse)
 	{
-		if (browse->data + 1 == ptr)
+		if (&browse->data + 1 == ptr)
 		{
 			if (browse->next && browse->past)
 			{
 				browse->next->past = browse->past;
 				browse->past->next = browse->next;
 			}
-			else if (browse->next == NULL) // nothing after
+			else if (browse->next == NULL && browse->past) // nothing after
 				browse->past->next = NULL;
 			else // very first but something after it
 				alc_mng.custom_plage = browse->next;
@@ -475,15 +475,18 @@ void *_realloc(void *ptr, size_t size)
 
 int main(void)
 {
-	void *dada;
+
+	char *mlc = (char*)_malloc(sizeof(char)*(4096-46));
+
 	int i = 0;
-	while (i < 1)
+	while (i < (4096-46))
 	{
 		//printf("%i\n", i);
-		dada = _malloc(120);
+		mlc[i] = '4';
 		i++;
 	}
-	_realloc(dada, 32);
-	
+
+	_free(mlc);
+
 	return 0;
 }
