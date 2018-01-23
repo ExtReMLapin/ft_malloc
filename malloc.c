@@ -13,6 +13,9 @@
 #include "malloc.h"
 #include <stdio.h>
 
+void _free(void *ptr);
+void *_malloc(size_t size);
+
 static unsigned long int page_size(bool big)
 {
 	unsigned int i;
@@ -37,6 +40,29 @@ static size_t closestsize(size_t size)
 		i++;
 	}
 	return (i * fact);
+}
+
+static void	*ft_memcpy(void *s1, const void *s2, size_t n)
+{
+	char	*c1;
+	char	*c2;
+
+	printf("%p %p\n", s1, s2);
+	if (n == 0 || s1 == s2)
+		return (s1);
+	c1 = (char *)s1;
+	c2 = (char *)s2;
+	while (--n)
+		*c1++ = *c2++;
+	*c1 = *c2;
+	return (s1);
+}
+
+size_t mathmin(size_t a, size_t b)
+{
+	if (a < b)
+		return (a);
+	return (b);
 }
 
 static void init_page(t_plage *plage, size_t size, bool custom)
@@ -285,8 +311,8 @@ void *special_custom_malloc(size_t size)
 
 void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool gocustom)
 {
-	t_plage page;
-	t_malloc mlc;
+	t_plage *page;
+	t_retplgmlc mlc;
 	void *mlc2;
 
 	if (incustom && gocustom)
@@ -305,15 +331,18 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 	}
 	else if(incustom) // custom plage -> pas custom plage
 	{
-		mlc = _malloc(size);
-		ft_memcpy(mlc, &incustom->data + 1, mathmin(incustom->size, size));
+		mlc2 = _malloc(size);
+		ft_memcpy(mlc2, &incustom->data + 1, mathmin(incustom->size, size));
 		_free(ptr);
-		return (mlc);
+		return (mlc2);
 	}
 	else // de data normal à custom;
 	{
+		mlc = find_mallocandplage(ptr);
+
 		mlc2 = _malloc(size);
-		ft_memcpy(mlc2, ptr, mathmin(data.mlc->end - ptr, size));
+		ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
+		return (mlc2);
 	}
 
 
@@ -322,11 +351,10 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 bool freecustomsizeptr(void *ptr)
 {
 	t_plage *browse;
-	t_malloc *malfind;
 
 	if (ptr == NULL || alc_mng.custom_plage == NULL)
 		return (false);
-	browse = find_cmalloc_in(ptr)
+	browse = find_cmalloc_in(ptr);
 	if (browse)
 	{
 		if (&browse->data + 1 == ptr)
@@ -404,7 +432,7 @@ void _free(void *ptr)
 		}
 		munmap(data.plage, data.plage->size);
 	}
-	else if (data.mlc->nest) // first of the plage
+	else if (data.mlc->next) // first of the plage
 	{
 		data.mlc->next->past = NULL;
 		data.plage->data = data.mlc->next; // here is the deal, its going to create some offset
@@ -420,28 +448,6 @@ void _free(void *ptr)
 }
 
 
-static void	*ft_memcpy(void *s1, const void *s2, size_t n)
-{
-	char	*c1;
-	char	*c2;
-
-	printf("%p %p\n", s1, s2);
-	if (n == 0 || s1 == s2)
-		return (s1);
-	c1 = (char *)s1;
-	c2 = (char *)s2;
-	while (--n)
-		*c1++ = *c2++;
-	*c1 = *c2;
-	return (s1);
-}
-
-size_t mathmin(size_t a, size_t b)
-{
-	if (a < b)
-		return (a);
-	return (b);
-}
 
 void *_realloc(void *ptr, size_t size)
 {
