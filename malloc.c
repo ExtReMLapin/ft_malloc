@@ -39,8 +39,6 @@ static size_t closestsize(size_t size)
 	return (i * fact);
 }
 
-
-
 static void init_page(t_plage *plage, size_t size, bool custom)
 {
 	printf("New plage at : %p with size = %lu\n", plage, size);
@@ -342,11 +340,9 @@ bool freecustomsizeptr(void *ptr)
 				browse->past->next = NULL;
 			else // very first but something after it
 				alc_mng.custom_plage = browse->next;
-
 			munmap(browse, browse->size);
 			return (true);
 		}
-
 	}
 	return (false);
 }
@@ -382,9 +378,9 @@ void _free(void *ptr)
 		printf("%s\n", "coudln't find ptr");
 		return;
 	}
-	if (data.mlc->past == NULL && data.mlc->next == NULL) // only plage of its category
+	if (data.mlc->past == NULL && data.mlc->next == NULL) // only malloc of its plage
 	{
-		if (data.plage->next && data.plage->past)
+		if (data.plage->next && data.plage->past) // mlc after and before
 		{
 			data.plage->next->past = data.plage->past;
 			data.plage->past->next = data.plage->next;
@@ -398,23 +394,24 @@ void _free(void *ptr)
 			else if (data.plage == alc_mng.med_plage)
 				alc_mng.med_plage = data.plage->next;
 		}
-		else
+		else // only of its plage
 		{
 			if (data.plage == alc_mng.small_plage)
 				alc_mng.small_plage = NULL;
 			else if (data.plage == alc_mng.med_plage)
 				alc_mng.med_plage = NULL;
+			
 		}
 		munmap(data.plage, data.plage->size);
 	}
-	else if (data.mlc->past == NULL)
+	else if (data.mlc->nest) // first of the plage
 	{
 		data.mlc->next->past = NULL;
-		data.plage->data = data.mlc->next;
+		data.plage->data = data.mlc->next; // here is the deal, its going to create some offset
 	}
-	else if (data.mlc->next == NULL)
+	else if (data.mlc->past) // last of the plage
 		data.mlc->past->next = NULL;
-	else
+	else // one before and one after it
 	{
 		data.mlc->past->next = data.mlc->next;
 		data.mlc->next->past = data.mlc->past;
@@ -476,7 +473,7 @@ void *_realloc(void *ptr, size_t size)
 				newmlc = find_free_space_plages(data.plage, size);
 				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
 				//newmlc->end = newmlc->data + size;
-				data.mlc->past->next = newmlc;
+				data.mlc->past->next = newmlc; // no need to free, lower level hacky free
 				data.mlc->next->past = newmlc;
 				return (newmlc->data);
 			}
@@ -486,7 +483,6 @@ void *_realloc(void *ptr, size_t size)
 			if (data.plage->max_allowed_alloc > (ptr + size))
 			{
 				printf("Free space : %lu\n",data.plage->max_allowed_alloc -  (ptr + size) );
-
 				data.mlc->end = data.mlc->data + size;
 				return (ptr); 
 			}
@@ -503,7 +499,6 @@ void *_realloc(void *ptr, size_t size)
 	}
 	else
 	{
-
 		newmlc = find_free_space_plages(correctplage, size);
 		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
 		_free(ptr);
