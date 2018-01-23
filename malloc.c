@@ -47,7 +47,6 @@ static void	*ft_memcpy(void *s1, const void *s2, size_t n)
 	char	*c1;
 	char	*c2;
 
-	printf("%p %p\n", s1, s2);
 	if (n == 0 || s1 == s2)
 		return (s1);
 	c1 = (char *)s1;
@@ -522,17 +521,12 @@ void *_realloc(void *ptr, size_t size)
 int main(void)
 {
 
-	char *mlc = (char*)_malloc(sizeof(char)*(4096-46));
+	int size = 40;
 
-	int i = 0;
-	while (i < (4096-46))
-	{
-		//printf("%i\n", i);
-		mlc[i] = '4';
-		i++;
-	}
-
+	void *mlc = _malloc(size);
 	_free(mlc);
+	_malloc(size);
+
 
 	return 0;
 }
