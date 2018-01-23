@@ -293,9 +293,12 @@ void *special_custom_malloc(size_t size)
 	t_plage *plagebrowse;
 
 	size_t plagesize;
-	if (alc_mng.custom_plage->data == NULL) // if very first malloc on custom
+	if (alc_mng.custom_plage == NULL) // if very first malloc on custom
+	{
+		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
+		init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + 1), true);
 		return (&alc_mng.custom_plage->data + 1);
-
+	}
 	plagesize = closestsize(size + sizeof(t_plage) + 1);
 	plagebrowse = alc_mng.custom_plage;
 	while (plagebrowse->next)
@@ -513,20 +516,22 @@ void *_realloc(void *ptr, size_t size)
 }
 
 
-// malloc ok (missing CUSTOM SIZE)
-// free ok
-// realloc for custom plage
+// malloc retest required
+// free retest required
+// realloc retest required
 // 
 
 int main(void)
 {
 
-	int size = 40;
-
-	void *mlc = _malloc(size);
-	_free(mlc);
-	_malloc(size);
-
+	void *dada;
+	int i = 0;
+	while (i < 500)
+	{
+		dada = _malloc(129);
+		_free(dada);
+		i++;
+	}
 
 	return 0;
 }

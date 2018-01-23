@@ -22,9 +22,9 @@
 #include <string.h>
 
 # define MAX_TINY_SIZE 	32
-# define TINY_PAGE_SIZE (MAX_TINY_SIZE * getpagesize())
+# define TINY_PAGE_SIZE (12 * getpagesize())
 # define MAX_MED_SIZE 	128
-# define MED_PAGE_SIZE 	(MAX_MED_SIZE * getpagesize())
+# define MED_PAGE_SIZE 	(24 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 
