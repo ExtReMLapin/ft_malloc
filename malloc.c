@@ -83,8 +83,8 @@ t_malloc *init_malloc(void* ptr, size_t size)
 		return NULL;
 	mlc = (t_malloc*)ptr;
 
-	mlc->data = (void*)(&(mlc->data)) + 1;
-	mlc->end = (void*)(&(mlc->data)) + size + 1;
+	mlc->data = (void*)(&(mlc->data)) + sizeof(void*);
+	mlc->end = (void*)(&(mlc->data)) + size + sizeof(void*);
 
 	mlc->next = NULL;
 	printf("New malloc at %p which ends at %p ang got return %p\n", mlc, mlc->end , mlc->data);
@@ -99,7 +99,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		return NULL;
 	if (plage->data == NULL) // very first malloc of the plage
 	{
-		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
+		plage->data = init_malloc(&plage->data + sizeof(void*), wanted - sizeof(t_malloc));
 		tmp = (t_malloc*)(plage->data);
 		tmp->past = NULL;
 		return (tmp);
@@ -107,9 +107,9 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	curmalloc = plage->data;
 	while (curmalloc && curmalloc->next) // searching for free space between already existings mallocs
 	{
-		if ((size_t)((void*)curmalloc->next - curmalloc->end + 1 ) > wanted) // find the first good place, not scanning the whole plages
+		if ((size_t)((void*)curmalloc->next - curmalloc->end + sizeof(void*) ) > wanted) // find the first good place, not scanning the whole plages
 		{
-			tmp = curmalloc->end + 1;
+			tmp = curmalloc->end + sizeof(void*);
 			init_malloc( tmp, wanted - sizeof(t_malloc));
 			tmp->next = curmalloc->next;
 			tmp->next->past = tmp;
@@ -119,9 +119,9 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 		curmalloc = curmalloc->next;
 	}	
 
-	if ((curmalloc->end + 1 + wanted) < plage->max_allowed_alloc) // if nothing between allocs then put it at the end
+	if ((curmalloc->end + sizeof(void*) + wanted) < plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
-		tmp = curmalloc->end + 1;		
+		tmp = curmalloc->end + sizeof(void*);		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
@@ -211,7 +211,7 @@ t_plage *find_cmalloc_in(void *ptr)
 	browse = alc_mng.custom_plage;
 	while (browse)
 	{
-		if (&browse->data + 1 == ptr)
+		if (&browse->data + sizeof(void*) == ptr)
 			return (browse);
 		if (browse->next)
 			browse = browse->next;
@@ -277,8 +277,8 @@ t_plage *checkpage(size_t size)
 	{
 		if (alc_mng.custom_plage == NULL)
 		{
-			alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
-			init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + 1), true);
+			alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
+			init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
 		}
 		return (alc_mng.custom_plage);
 	}
@@ -292,18 +292,18 @@ void *special_custom_malloc(size_t size)
 	size_t plagesize;
 	if (alc_mng.custom_plage == NULL) // if very first malloc on custom
 	{
-		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
-		init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + 1), true);
-		return (&alc_mng.custom_plage->data + 1);
+		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
+		init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
+		return (&alc_mng.custom_plage->data + sizeof(void*));
 	}
-	plagesize = closestsize(size + sizeof(t_plage) + 1);
+	plagesize = closestsize(size + sizeof(t_plage) + sizeof(void*));
 	plagebrowse = alc_mng.custom_plage;
 	while (plagebrowse->next)
 		plagebrowse = plagebrowse->next;
 	plagebrowse->next = (t_plage*)ezmmap(plagesize);
 	init_page(plagebrowse->next, plagesize, true);
 	plagebrowse->next->past = plagebrowse;
-	return (&plagebrowse->next->data + 1);
+	return (&plagebrowse->next->data + sizeof(void*));
 }
 
 
@@ -315,22 +315,22 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 
 	if (incustom && gocustom)
 	{
-		if (incustom->size - (sizeof(t_plage) + 1) >= size ) // already enough room in the current plage
+		if (incustom->size - (sizeof(t_plage) + sizeof(void*)) >= size ) // already enough room in the current plage
 			return (ptr);
 		else
 		{
-			page = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + 1));
-			init_page(page, closestsize(size + sizeof(t_plage) + 1), true);
-			ft_memcpy(&page->data + 1, &incustom->data + 1, mathmin(incustom->size, size));
+			page = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
+			init_page(page, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
+			ft_memcpy(&page->data + sizeof(void*), &incustom->data + sizeof(void*), mathmin(incustom->size, size));
 			_free(ptr);
-			return (&page->data + 1);
+			return (&page->data + sizeof(void*));
 		}
 
 	}
 	else if(incustom) // custom plage -> pas custom plage
 	{
 		mlc2 = _malloc(size);
-		ft_memcpy(mlc2, &incustom->data + 1, mathmin(incustom->size, size));
+		ft_memcpy(mlc2, &incustom->data + sizeof(void*), mathmin(incustom->size, size));
 		_free(ptr);
 		return (mlc2);
 	}
@@ -353,7 +353,7 @@ bool freecustomsizeptr(void *ptr)
 	browse = find_cmalloc_in(ptr);
 	if (browse)
 	{
-		if (&browse->data + 1 == ptr)
+		if (&browse->data + sizeof(void*) == ptr)
 		{
 			if (browse->next && browse->past)
 			{
@@ -529,7 +529,6 @@ int main(void)
 	void *bide = _malloc(28);
 	strrr(bide);
 	printf("%s %s\n", dada, bide);*/
-	
 	
 
 
