@@ -78,7 +78,7 @@ static void init_page(t_plage *plage, size_t size, bool custom)
 t_malloc *init_malloc(void* ptr, size_t size)
 {
 	t_malloc *mlc;
-	printf("New malloc at %p\n", ptr);
+	
 	if (ptr == NULL)
 		return NULL;
 	mlc = (t_malloc*)ptr;
@@ -87,6 +87,7 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	mlc->end = (void*)(&(mlc->data)) + size + 1;
 
 	mlc->next = NULL;
+	printf("New malloc at %p which ends at %p\n", mlc, mlc->end);
 	return (mlc);
 }
 
@@ -497,15 +498,42 @@ void *_realloc(void *ptr, size_t size)
 // realloc retest required
 // 
 
+
+void strrr(char *str)
+{
+	int i = 0;
+
+	while (i < 26)
+	{
+		str[i] = 'a' + i;
+		i++;
+	}
+	str[i] = '\0';
+	printf("%p\n", &str[i]);
+}
+
 int main(void)
 {
 
 	void *dada;
+
+	/*dada = _malloc(28);
+	strrr(dada);
+	printf("%s\n", dada);
+	void *bide = _malloc(28);
+	strrr(bide);
+	printf("%s %s\n", dada, bide);*/
+	
+
+	void *bide;
 	int i = 0;
-	while (i < 500)
+	while (i < 20)
 	{
-		dada = _malloc(127);
-		_free(dada);
+		dada = _malloc(28);
+		bide = _malloc(28);
+		strrr(dada);
+		strrr(bide);
+		printf("%s %s\n", dada, bide);
 		i++;
 	}
 
