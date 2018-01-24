@@ -4,6 +4,17 @@
 First project working with low-level access to the memory, handeling the malloc function myself, preventing any fragmentation by filling ram "holes" after data was freed
 
 
+ignoring laws of physic since 2018
+
+![](https://puu.sh/z8yW6/db4c4ae49e.png)
+![](https://puu.sh/z8yYc/b9e5d3ae8d.png)
+![](https://puu.sh/z8yYK/cbea68e25c.png)
+![](https://puu.sh/z8yZp/8aa545df7e.png)
+
+
+
+
+
 ``` C
 
 
