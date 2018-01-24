@@ -95,16 +95,13 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	t_malloc *curmalloc;
 	t_malloc *tmp;
 	if (wanted > plage->size)
-	{
-		printf("%s\n", "REQUESTED SIZE IS BIGGER THAN THE PLAGE, THIS SHOULD NOT HAPPEN");
 		return NULL;
-	}
 	if (plage->data == NULL) // very first malloc of the plage
 	{
 		plage->data = init_malloc(&plage->data + 1, wanted - sizeof(t_malloc));
-		t_malloc	*mal = (t_malloc*)(plage->data);
-		mal->past = NULL;
-		return (mal);
+		tmp = (t_malloc*)(plage->data);
+		tmp->past = NULL;
+		return (tmp);
 	}
 	curmalloc = plage->data;
 	while (curmalloc && curmalloc->next) // searching for free space between already existings mallocs
@@ -123,17 +120,12 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 
 	if ((curmalloc->end + 1 + wanted) < plage->max_allowed_alloc) // if nothing between allocs then put it at the end
 	{
-
-		//printf("Free space before malloc : %lu \n", plage->max_allowed_alloc - (curmalloc->end + 1));
-
 		tmp = curmalloc->end + 1;		
 		curmalloc->next = tmp;
 		tmp->past = curmalloc;
 		init_malloc(tmp, wanted - sizeof(t_malloc));
-		//printf("free space after malloc : %lu at %p \n", plage->max_allowed_alloc - tmp->end, tmp->end);
 		return (tmp);
 	}
-	//printf("last alloc end is at %p, free space before end is : %lu while we need space : %lu\n",curmalloc->end , plage->max_allowed_alloc - curmalloc->end, wanted );
 	return (NULL);
 }
 
@@ -283,7 +275,6 @@ t_plage *checkpage(size_t size)
 			init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + 1), true);
 		}
 		return (alc_mng.custom_plage);
-
 	}
 	return (NULL);
 }
@@ -303,7 +294,6 @@ void *special_custom_malloc(size_t size)
 	plagebrowse = alc_mng.custom_plage;
 	while (plagebrowse->next)
 		plagebrowse = plagebrowse->next;
-
 	plagebrowse->next = (t_plage*)ezmmap(plagesize);
 	init_page(plagebrowse->next, plagesize, true);
 	plagebrowse->next->past = plagebrowse;
@@ -341,13 +331,10 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 	else // de data normal à custom;
 	{
 		mlc = find_mallocandplage(ptr);
-
 		mlc2 = _malloc(size);
 		ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
 		return (mlc2);
 	}
-
-
 }
 
 bool freecustomsizeptr(void *ptr)
@@ -410,7 +397,7 @@ void _free(void *ptr)
 	}
 	if (data.mlc->past == NULL && data.mlc->next == NULL) // only malloc of its plage
 	{
-		if (data.plage->next && data.plage->past) // mlc after and before
+		if (data.plage->next && data.plage->past) // plage after and before
 		{
 			data.plage->next->past = data.plage->past;
 			data.plage->past->next = data.plage->next;
@@ -424,14 +411,12 @@ void _free(void *ptr)
 			else if (data.plage == alc_mng.med_plage)
 				alc_mng.med_plage = data.plage->next;
 		}
-		else // only of its plage
+		else // only plage of its category
 		{
-			if (data.plage == alc_mng.small_plage)
-				alc_mng.small_plage = NULL;
-			else if (data.plage == alc_mng.med_plage)
-				alc_mng.med_plage = NULL;
-			
+			data.plage->data = NULL;
+			return;
 		}
+		
 		munmap(data.plage, data.plage->size);
 	}
 	else if (data.mlc->next) // first of the plage
@@ -457,13 +442,9 @@ void *_realloc(void *ptr, size_t size)
 	t_malloc *newmlc;
 	t_plage *correctplage;
 
-
-
 	correctplage = checkpage(size);
 	if (correctplage == alc_mng.custom_plage || find_cmalloc_in(ptr))
 		return (special_custom_realloc(ptr, size,find_cmalloc_in(ptr) , correctplage == alc_mng.custom_plage ));
-
-
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return (NULL);
@@ -480,7 +461,6 @@ void *_realloc(void *ptr, size_t size)
 			{
 				newmlc = find_free_space_plages(data.plage, size);
 				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
-				//newmlc->end = newmlc->data + size;
 				data.mlc->past->next = newmlc; // no need to free, lower level hacky free
 				data.mlc->next->past = newmlc;
 				return (newmlc->data);
@@ -490,7 +470,6 @@ void *_realloc(void *ptr, size_t size)
 		{
 			if (data.plage->max_allowed_alloc > (ptr + size))
 			{
-				printf("Free space : %lu\n",data.plage->max_allowed_alloc -  (ptr + size) );
 				data.mlc->end = data.mlc->data + size;
 				return (ptr); 
 			}
@@ -498,9 +477,7 @@ void *_realloc(void *ptr, size_t size)
 			{
 				newmlc = find_free_space_plages(data.plage, size);
 				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
-				//newmlc->end = newmlc->data + size;
 				data.mlc->past->next = newmlc;
-				//printf("new realloc at %p\n", newmlc);
 				return (newmlc->data);
 			}
 		}
@@ -511,7 +488,6 @@ void *_realloc(void *ptr, size_t size)
 		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
 		_free(ptr);
 		return (newmlc->data);
-
 	}
 }
 
@@ -528,7 +504,7 @@ int main(void)
 	int i = 0;
 	while (i < 500)
 	{
-		dada = _malloc(129);
+		dada = _malloc(127);
 		_free(dada);
 		i++;
 	}
