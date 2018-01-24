@@ -16,10 +16,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/mman.h>
-# include <errno.h>
 # include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
+
 
 # define MAX_TINY_SIZE 	32
 # define TINY_PAGE_SIZE (12 * getpagesize())
