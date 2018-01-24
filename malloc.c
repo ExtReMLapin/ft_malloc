@@ -87,7 +87,7 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	mlc->end = (void*)(&(mlc->data)) + size + 1;
 
 	mlc->next = NULL;
-	printf("New malloc at %p which ends at %p\n", mlc, mlc->end);
+	printf("New malloc at %p which ends at %p ang got return %p\n", mlc, mlc->end , mlc->data);
 	return (mlc);
 }
 
@@ -191,6 +191,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 				if (mal->data == ptr)
 					return (mal);
 				mal = mal->next;
+				printf("looking for %p but found %p \n", ptr, mal->data);
 			}
 			printf("%s\n", "wtf didnt find");
 			return (NULL);
@@ -230,9 +231,11 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	ret.mlc = NULL;
 	if (ptr == NULL)
 		return (ret);
+	printf("%s\n", "step 1");
 	malfind = find_malloc_in(ptr, alc_mng.small_plage);
 	if (malfind)
 	{
+		printf("%s\n", "step2");
 		ret.plage = alc_mng.small_plage;
 		ret.mlc = malfind;
 		return (ret);
@@ -240,10 +243,12 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	malfind = find_malloc_in(ptr, alc_mng.med_plage);
 	if (malfind)
 	{
+		printf("%s\n", "step 3");
 		ret.plage = alc_mng.med_plage;
 		ret.mlc = malfind;
 		return (ret);
 	}
+	printf("%s\n", "step 4");
 	return (ret);
 }
 
@@ -332,6 +337,7 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 	else // de data normal à custom;
 	{
 		mlc = find_mallocandplage(ptr);
+		printf("%p %s\n", mlc.plage , "nigg");
 		mlc2 = _malloc(size);
 		ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
 		return (mlc2);
@@ -503,9 +509,9 @@ void strrr(char *str)
 {
 	int i = 0;
 
-	while (i < 26)
+	while (i < 95)
 	{
-		str[i] = 'a' + i;
+		str[i] = 32 + i;
 		i++;
 	}
 	str[i] = '\0';
@@ -524,18 +530,24 @@ int main(void)
 	strrr(bide);
 	printf("%s %s\n", dada, bide);*/
 	
+	
+
+
+
 
 	void *bide;
 	int i = 0;
-	while (i < 20)
-	{
-		dada = _malloc(28);
-		bide = _malloc(28);
+	/*while (i < 20)
+	{*/
+		dada = _malloc(96);
+		bide = _malloc(96);
 		strrr(dada);
 		strrr(bide);
-		printf("%s %s\n", dada, bide);
+
+		_realloc(dada, 129);
+		printf("%i %s %s\n",strcmp(dada, bide), dada, bide);
 		i++;
-	}
+	//}
 
 	return 0;
 }
