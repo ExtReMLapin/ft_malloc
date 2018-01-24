@@ -220,9 +220,6 @@ void show_alloc_mem()
 		printf("LARGE : %p \n", alc_mng.custom_plage);
 		show_alloc_mem_plg(alc_mng.custom_plage, true);
 	}
-
-
-
 }
 
 t_malloc *find_malloc_in(void *ptr, t_plage *plage)
@@ -325,20 +322,13 @@ t_plage *checkpage(size_t size)
 	}
 	else
 	{
-		if (alc_mng.custom_plage == NULL)
-		{
-			alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
-			init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
-		}
 		return (alc_mng.custom_plage);
 	}
-	return (NULL);
 }
 
 void *special_custom_malloc(size_t size)
 {
 	t_plage *plagebrowse;
-
 	size_t plagesize;
 	if (alc_mng.custom_plage == NULL) // if very first malloc on custom
 	{
@@ -430,7 +420,7 @@ void *_malloc(size_t size)
 	if (size == 0)
 		return (NULL);
 	target = checkpage(size);
-	if (target->custom == false)
+	if (target && target->custom == false)
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
 	else
 		return (special_custom_malloc(size));
@@ -572,29 +562,21 @@ int main(void)
 {
 
 	
-	void *data;
-
+	void *dada;
 	void* dede;
-
-	/*dada = _malloc(28);
-	strrr(dada);
-	printf("%s\n", dada);
-	void *bide = _malloc(28);
-	strrr(bide);
-	printf("%s %s\n", dada, bide);*/
 	
 	_malloc(128);
 	dede = _malloc(128);
 	_malloc(120);
 	_malloc(32);
-	data = _malloc(3);
+	dada = _malloc(3);
 	_malloc(8);
 
-	_free(data);
+	_free(dada);
 	_free(dede);
 
-	_malloc(500);
-//	_malloc(900);
+	_malloc(50000);
+	_malloc(900);
 
 	show_alloc_mem();
 
