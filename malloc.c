@@ -84,7 +84,7 @@ t_malloc *init_malloc(void* ptr, size_t size)
 	mlc = (t_malloc*)ptr;
 
 	mlc->data = (void*)(&(mlc->data)) + sizeof(void*);
-	mlc->end = (void*)(&(mlc->data)) + size + sizeof(void*);
+	mlc->end = mlc->data + size + sizeof(void*);
 
 	mlc->next = NULL;
 	printf("New malloc at %p which ends at %p ang got return %p\n", mlc, mlc->end , mlc->data);
@@ -107,7 +107,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 	curmalloc = plage->data;
 	while (curmalloc && curmalloc->next) // searching for free space between already existings mallocs
 	{
-		if ((size_t)((void*)curmalloc->next - curmalloc->end + sizeof(void*) ) > wanted) // find the first good place, not scanning the whole plages
+		if ((size_t)((void*)curmalloc->next - (curmalloc->end + sizeof(void*)) ) > wanted) // find the first good place, not scanning the whole plages
 		{
 			tmp = curmalloc->end + sizeof(void*);
 			init_malloc( tmp, wanted - sizeof(t_malloc));
@@ -191,7 +191,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 				if (mal->data == ptr)
 					return (mal);
 				mal = mal->next;
-				printf("looking for %p but found %p \n", ptr, mal->data);
+				//printf("looking for %p but found %p \n", ptr, mal->data);
 			}
 			printf("%s\n", "wtf didnt find");
 			return (NULL);
@@ -231,11 +231,9 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	ret.mlc = NULL;
 	if (ptr == NULL)
 		return (ret);
-	printf("%s\n", "step 1");
 	malfind = find_malloc_in(ptr, alc_mng.small_plage);
 	if (malfind)
 	{
-		printf("%s\n", "step2");
 		ret.plage = alc_mng.small_plage;
 		ret.mlc = malfind;
 		return (ret);
@@ -243,12 +241,10 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	malfind = find_malloc_in(ptr, alc_mng.med_plage);
 	if (malfind)
 	{
-		printf("%s\n", "step 3");
 		ret.plage = alc_mng.med_plage;
 		ret.mlc = malfind;
 		return (ret);
 	}
-	printf("%s\n", "step 4");
 	return (ret);
 }
 
@@ -337,7 +333,6 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 	else // de data normal à custom;
 	{
 		mlc = find_mallocandplage(ptr);
-		printf("%p %s\n", mlc.plage , "nigg");
 		mlc2 = _malloc(size);
 		ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
 		return (mlc2);
@@ -467,7 +462,7 @@ void *_realloc(void *ptr, size_t size)
 			else // no freespace after it so we just realoc it
 			{
 				newmlc = find_free_space_plages(data.plage, size);
-				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
+				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - data.mlc->data, size));
 				data.mlc->past->next = newmlc; // no need to free, lower level hacky free
 				data.mlc->next->past = newmlc;
 				return (newmlc->data);
@@ -483,7 +478,7 @@ void *_realloc(void *ptr, size_t size)
 			else // no free space at the end
 			{
 				newmlc = find_free_space_plages(data.plage, size);
-				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
+				ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - data.mlc->data, size));
 				data.mlc->past->next = newmlc;
 				return (newmlc->data);
 			}
@@ -492,7 +487,7 @@ void *_realloc(void *ptr, size_t size)
 	else
 	{
 		newmlc = find_free_space_plages(correctplage, size);
-		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - ptr, size));
+		ft_memcpy(newmlc->data, ptr, mathmin(data.mlc->end - data.mlc->data, size));
 		_free(ptr);
 		return (newmlc->data);
 	}
@@ -515,7 +510,6 @@ void strrr(char *str)
 		i++;
 	}
 	str[i] = '\0';
-	printf("%p\n", &str[i]);
 }
 
 int main(void)
@@ -536,17 +530,17 @@ int main(void)
 
 	void *bide;
 	int i = 0;
-	/*while (i < 20)
-	{*/
+	while (i < 20)
+	{
 		dada = _malloc(96);
 		bide = _malloc(96);
 		strrr(dada);
 		strrr(bide);
 
-		_realloc(dada, 129);
-		printf("%i %s %s\n",strcmp(dada, bide), dada, bide);
+		dada =_realloc(dada, 12);
+		//printf("%i %s %s\n",strcmp(dada, bide), dada, bide);
 		i++;
-	//}
+	}
 
 	return 0;
 }
