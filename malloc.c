@@ -184,18 +184,18 @@ void show_alloc_mem_plg(t_plage *plg, bool custom)
 		i = 1;
 		if (! custom)
 		{
-			printf(" Plage #%i with size %lu @ %p\n", i1, plg1->size, plg1);
+			printf("	Plage #%i with size %lu @ %p\n", i1, plg1->size, plg1);
 			while (mlc)
 			{
-				printf("   #%i %p [%p -> %p] %lu bytes\n",i, mlc, mlc->data, mlc->end, mlc->end - mlc->data - sizeof(void*));
+				printf("		#%i %p [%p -> %p] %lu bytes\n",i, mlc, mlc->data, mlc->end, mlc->end - mlc->data - sizeof(void*));
 				if (mlc->next && (mlc->end + sizeof(void*) != mlc->next))
-					printf("   free space of %lu bytes from %p to %p \n", (void*)mlc->next - mlc->end , mlc->end+1, (void*)mlc->next - 1);
+					printf("		free space of %lu bytes from %p to %p \n", (void*)mlc->next - mlc->end , mlc->end+1, (void*)mlc->next - 1);
 				i++;
 				mlc = mlc->next;
 			}
 		}
 		else
-			printf(" Custom plage #%i with size %lu @ %p\n",i1, plg1->size, plg1 );
+			printf("	Custom plage #%i with size %lu @ %p\n",i1, plg1->size, plg1 );
 
 		i1++;
 		plg1 = plg1->next;
@@ -560,8 +560,6 @@ void strrr(char *str)
 
 int main(void)
 {
-
-	
 	void *dada;
 	void* dede;
 	
@@ -579,9 +577,5 @@ int main(void)
 	_malloc(900);
 
 	show_alloc_mem();
-
-
-
-
 	return 0;
 }
