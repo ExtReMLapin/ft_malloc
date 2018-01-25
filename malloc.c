@@ -547,35 +547,15 @@ void *_realloc(void *ptr, size_t size)
 	}
 }
 
-void strrr(char *str)
+#include <stdlib.h>
+
+int main()
 {
-	int i = 0;
-
-	while (i < 95)
-	{
-		str[i] = 32 + i;
-		i++;
-	}
-	str[i] = '\0';
-}
-
-#define M (1024 * 1024)
-
-void print(char *s)
-{
-   write(1, s, strlen(s));
-}
-
-int     main()
-{
-   char *addr1;
-   char *addr3;
-
-   addr1 = (char*)malloc(16*M);
-   strcpy(addr1, "Bonjours\n");
-   print(addr1);
-   addr3 = (char*)realloc(addr1, 128*M);
-   addr3[127*M] = 42;
-   print(addr3);
+   _malloc(1024);
+   _malloc(1024 * 32);
+   _malloc(1024 * 1024);
+   _malloc(1024 * 1024 * 16);
+   _malloc(1024 * 1024 * 128);
+   show_alloc_mem();
    return (0);
 }
