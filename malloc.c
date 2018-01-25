@@ -12,6 +12,7 @@
 
 #include "malloc.h"
 #include <stdio.h>
+#include <string.h>
 
 void _free(void *ptr);
 void *_malloc(size_t size);
@@ -59,6 +60,8 @@ static void	*ft_memcpy(void *s1, const void *s2, size_t n)
 	*c1 = *c2;
 	return (s1);
 }
+
+
 
 size_t mathmin(size_t a, size_t b)
 {
@@ -334,6 +337,7 @@ void *special_custom_malloc(size_t size)
 	{
 		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
 		init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
+		alc_mng.custom_plage->max_allowed_alloc = (void*) &alc_mng.custom_plage->data + size; 
 		return (&alc_mng.custom_plage->data + sizeof(void*));
 	}
 	plagesize = closestsize(size + sizeof(t_plage) + sizeof(void*));
@@ -343,6 +347,7 @@ void *special_custom_malloc(size_t size)
 	plagebrowse->next = (t_plage*)ezmmap(plagesize);
 	init_page(plagebrowse->next, plagesize, true);
 	plagebrowse->next->past = plagebrowse;
+	plagebrowse->next->max_allowed_alloc = (void*)&plagebrowse->next->data + size; 
 	return (&plagebrowse->next->data + sizeof(void*));
 }
 
@@ -355,13 +360,15 @@ void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool goc
 
 	if (incustom && gocustom)
 	{
-		if (incustom->size - (sizeof(t_plage) + sizeof(void*)) >= size ) // already enough room in the current plage
+		if (incustom->size - (sizeof(t_plage) + sizeof(void*)) >= size )
+		{// already enough room in the current plage
 			return (ptr);
+		}
 		else
 		{
 			page = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
 			init_page(page, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
-			ft_memcpy(&page->data + sizeof(void*), &incustom->data + sizeof(void*), mathmin(incustom->size, size));
+			ft_memcpy(&page->data + sizeof(void*), &incustom->data + sizeof(void*), mathmin(incustom->max_allowed_alloc - (void*)&incustom->data  , size));
 			_free(ptr);
 			return (&page->data + sizeof(void*));
 		}
@@ -496,6 +503,7 @@ void *_realloc(void *ptr, size_t size)
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return (NULL);
+
 	if (data.plage == correctplage)
 	{
 		if (data.mlc->next != NULL)
@@ -551,21 +559,23 @@ void strrr(char *str)
 	str[i] = '\0';
 }
 
-int      main()
+#define M (1024 * 1024)
+
+void print(char *s)
 {
-   int   i;
-   char  *addr;
+   write(1, s, strlen(s));
+}
 
-   i = 0;
-	while (i < 1024)
-	{
-		addr = (char*)_malloc(1024);
-		i++;
-		//printf("%i\n",i );
-	}
-   _malloc(1024);
+int     main()
+{
+   char *addr1;
+   char *addr3;
 
-  // show_alloc_mem();
- 
+   addr1 = (char*)malloc(16*M);
+   strcpy(addr1, "Bonjours\n");
+   print(addr1);
+   addr3 = (char*)realloc(addr1, 128*M);
+   addr3[127*M] = 42;
+   print(addr3);
    return (0);
 }
