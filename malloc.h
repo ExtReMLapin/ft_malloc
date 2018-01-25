@@ -19,10 +19,10 @@
 # include <stdbool.h>
 
 
-# define MAX_TINY_SIZE 	32
+# define MAX_TINY_SIZE 	64
 # define TINY_PAGE_SIZE (12 * getpagesize())
-# define MAX_MED_SIZE 	128
-# define MED_PAGE_SIZE 	(24 * getpagesize())
+# define MAX_MED_SIZE 	2048
+# define MED_PAGE_SIZE 	(128 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 

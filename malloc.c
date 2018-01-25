@@ -33,8 +33,11 @@ static void *ezmmap(unsigned long int size)
 
 static size_t closestsize(size_t size)
 {
-	int i = 1;
-	size_t fact = getpagesize();
+	int		i;
+	size_t	fact;
+
+	i = 1;
+	fact = getpagesize();
 	while (i * fact < size)
 	{
 		i++;
@@ -86,7 +89,6 @@ t_malloc *init_malloc(void* ptr, size_t size)
 
 	mlc->data = (void*)(&(mlc->data)) + sizeof(void*);
 	mlc->end = mlc->data + size + sizeof(void*);
-
 	mlc->next = NULL;
 	return (mlc);
 }
@@ -95,6 +97,7 @@ static t_malloc* find_freespace(t_plage *plage, size_t wanted)
 {
 	t_malloc *curmalloc;
 	t_malloc *tmp;
+
 	if (plage == NULL || wanted > plage->size || wanted == 0)
 		return NULL;
 	if (plage->data == NULL) // very first malloc of the plage
@@ -138,7 +141,6 @@ static t_malloc *find_free_space_plages(t_plage *plage, size_t wanted)
 
 	if (plage == NULL || wanted == 0)
 		return (NULL);
-
 	found = false;
 	plagebrowse = plage;
 	while (plagebrowse)
@@ -177,17 +179,17 @@ void show_alloc_mem_plg(t_plage *plg, bool custom)
 	t_plage *plg1;
 
 	i1 = 1;
-	mlc = plg->data;
 	plg1 = plg;
 	while (plg1)
 	{
 		i = 1;
 		if (! custom)
 		{
+			mlc = plg1->data;
 			printf("	Plage #%i with size %lu @ %p\n", i1, plg1->size, plg1);
 			while (mlc)
 			{
-				printf("		#%i %p [%p -> %p] %lu bytes\n",i, mlc, mlc->data, mlc->end, mlc->end - mlc->data - sizeof(void*));
+				printf("		alloc #%i %p [%p -> %p] %lu bytes\n",i, mlc, mlc->data, mlc->end, mlc->end - mlc->data - sizeof(void*));
 				if (mlc->next && (mlc->end + sizeof(void*) != mlc->next))
 					printf("		free space of %lu bytes from %p to %p \n", (void*)mlc->next - mlc->end , mlc->end+1, (void*)mlc->next - 1);
 				i++;
@@ -196,7 +198,6 @@ void show_alloc_mem_plg(t_plage *plg, bool custom)
 		}
 		else
 			printf("	Custom plage #%i with size %lu @ %p\n",i1, plg1->size, plg1 );
-
 		i1++;
 		plg1 = plg1->next;
 	}
@@ -212,7 +213,7 @@ void show_alloc_mem()
 	}
 	if (alc_mng.med_plage && alc_mng.med_plage->data)
 	{
-		printf("SMALL : %p \n", alc_mng.med_plage);
+		printf("MEDIUM : %p \n", alc_mng.med_plage);
 		show_alloc_mem_plg(alc_mng.med_plage, false);
 	}
 	if (alc_mng.custom_plage)
@@ -224,12 +225,12 @@ void show_alloc_mem()
 
 t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 {
-	t_plage *plagebrowse;
+	t_plage		*plagebrowse;
+	t_malloc	*mal;
 
 	if (plage == NULL || !plage->data || ptr == NULL)
 		return (NULL);
 	plagebrowse = plage;
-	t_malloc *mal;
 	while (plagebrowse)
 	{
 		if (ptr > (void*)plagebrowse->data && ptr < plagebrowse->max_allowed_alloc)
@@ -240,9 +241,7 @@ t_malloc *find_malloc_in(void *ptr, t_plage *plage)
 				if (mal->data == ptr)
 					return (mal);
 				mal = mal->next;
-				//printf("looking for %p but found %p \n", ptr, mal->data);
 			}
-			printf("%s\n", "wtf didnt find");
 			return (NULL);
 		}
 		else if (plagebrowse->next)
@@ -275,8 +274,8 @@ t_plage *find_cmalloc_in(void *ptr)
 
 t_retplgmlc find_mallocandplage(void *ptr)
 {
-	t_retplgmlc ret;
-	t_malloc *malfind;
+	t_retplgmlc	ret;
+	t_malloc 	*malfind;
 
 	ret.plage = NULL;
 	ret.mlc = NULL;
@@ -328,8 +327,9 @@ t_plage *checkpage(size_t size)
 
 void *special_custom_malloc(size_t size)
 {
-	t_plage *plagebrowse;
-	size_t plagesize;
+	t_plage	*plagebrowse;
+	size_t	plagesize;
+
 	if (alc_mng.custom_plage == NULL) // if very first malloc on custom
 	{
 		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
@@ -349,9 +349,9 @@ void *special_custom_malloc(size_t size)
 
 void *special_custom_realloc(void *ptr, size_t size, t_plage *incustom, bool gocustom)
 {
-	t_plage *page;
-	t_retplgmlc mlc;
-	void *mlc2;
+	t_plage		*page;
+	t_retplgmlc	mlc;
+	void		*mlc2;
 
 	if (incustom && gocustom)
 	{
@@ -424,7 +424,6 @@ void *_malloc(size_t size)
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
 	else
 		return (special_custom_malloc(size));
-
 	if (adr != NULL)
 		return (adr->data);
 	return (NULL);	
@@ -433,9 +432,10 @@ void *_malloc(size_t size)
 void _free(void *ptr)
 {
 	t_retplgmlc data;
+
+
 	if (freecustomsizeptr(ptr)) // found it in custom plages
 		return;
-
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return;
@@ -539,13 +539,6 @@ void *_realloc(void *ptr, size_t size)
 	}
 }
 
-
-// malloc retest required
-// free retest required
-// realloc retest required
-// 
-
-
 void strrr(char *str)
 {
 	int i = 0;
@@ -558,24 +551,21 @@ void strrr(char *str)
 	str[i] = '\0';
 }
 
-int main(void)
+int      main()
 {
-	void *dada;
-	void* dede;
-	
-	_malloc(128);
-	dede = _malloc(128);
-	_malloc(120);
-	_malloc(32);
-	dada = _malloc(3);
-	_malloc(8);
+   int   i;
+   char  *addr;
 
-	_free(dada);
-	_free(dede);
+   i = 0;
+	while (i < 1024)
+	{
+		addr = (char*)_malloc(1024);
+		i++;
+		//printf("%i\n",i );
+	}
+   _malloc(1024);
 
-	_malloc(50000);
-	_malloc(900);
-
-	show_alloc_mem();
-	return 0;
+  // show_alloc_mem();
+ 
+   return (0);
 }
