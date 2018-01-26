@@ -17,16 +17,6 @@
 void _free(void *ptr);
 void *_malloc(size_t size);
 
-static unsigned long int page_size(bool big)
-{
-	unsigned int i;
-	if (big)
-		i = MED_PAGE_SIZE;
-	else
-		i = TINY_PAGE_SIZE;
-	return (i);
-}
-
 static void *ezmmap(unsigned long int size)
 {
 	return mmap(0, size, PROT, MAP, -1, 0);
@@ -60,8 +50,6 @@ static void	*ft_memcpy(void *s1, const void *s2, size_t n)
 	*c1 = *c2;
 	return (s1);
 }
-
-
 
 size_t mathmin(size_t a, size_t b)
 {
@@ -209,20 +197,20 @@ void show_alloc_mem_plg(t_plage *plg, bool custom)
 
 void show_alloc_mem()
 {
-	if (alc_mng.small_plage && alc_mng.small_plage->data)
+	if (g_alc_mng.small_plage && g_alc_mng.small_plage->data)
 	{
-		printf("TINY : %p \n", alc_mng.small_plage);
-		show_alloc_mem_plg(alc_mng.small_plage, false);
+		printf("TINY : %p \n", g_alc_mng.small_plage);
+		show_alloc_mem_plg(g_alc_mng.small_plage, false);
 	}
-	if (alc_mng.med_plage && alc_mng.med_plage->data)
+	if (g_alc_mng.med_plage && g_alc_mng.med_plage->data)
 	{
-		printf("MEDIUM : %p \n", alc_mng.med_plage);
-		show_alloc_mem_plg(alc_mng.med_plage, false);
+		printf("MEDIUM : %p \n", g_alc_mng.med_plage);
+		show_alloc_mem_plg(g_alc_mng.med_plage, false);
 	}
-	if (alc_mng.custom_plage)
+	if (g_alc_mng.custom_plage)
 	{
-		printf("LARGE : %p \n", alc_mng.custom_plage);
-		show_alloc_mem_plg(alc_mng.custom_plage, true);
+		printf("LARGE : %p \n", g_alc_mng.custom_plage);
+		show_alloc_mem_plg(g_alc_mng.custom_plage, true);
 	}
 }
 
@@ -261,7 +249,7 @@ t_plage *find_cmalloc_in(void *ptr)
 
 	if (ptr == NULL)
 		return (NULL);
-	browse = alc_mng.custom_plage;
+	browse = g_alc_mng.custom_plage;
 	while (browse)
 	{
 		if (&browse->data + sizeof(void*) == ptr)
@@ -284,17 +272,17 @@ t_retplgmlc find_mallocandplage(void *ptr)
 	ret.mlc = NULL;
 	if (ptr == NULL)
 		return (ret);
-	malfind = find_malloc_in(ptr, alc_mng.small_plage);
+	malfind = find_malloc_in(ptr, g_alc_mng.small_plage);
 	if (malfind)
 	{
-		ret.plage = alc_mng.small_plage;
+		ret.plage = g_alc_mng.small_plage;
 		ret.mlc = malfind;
 		return (ret);
 	}
-	malfind = find_malloc_in(ptr, alc_mng.med_plage);
+	malfind = find_malloc_in(ptr, g_alc_mng.med_plage);
 	if (malfind)
 	{
-		ret.plage = alc_mng.med_plage;
+		ret.plage = g_alc_mng.med_plage;
 		ret.mlc = malfind;
 		return (ret);
 	}
@@ -306,25 +294,25 @@ t_plage *checkpage(size_t size)
 {
 	if (size <= MAX_TINY_SIZE)
 	{
-		if (alc_mng.small_plage == NULL)
+		if (g_alc_mng.small_plage == NULL)
 		{
-			alc_mng.small_plage = (t_plage*)ezmmap(page_size(false));
-			init_page(alc_mng.small_plage, TINY_PAGE_SIZE, false);
+			g_alc_mng.small_plage = (t_plage*)ezmmap(TINY_PAGE_SIZE);
+			init_page(g_alc_mng.small_plage, TINY_PAGE_SIZE, false);
 		}
-		return (alc_mng.small_plage);
+		return (g_alc_mng.small_plage);
 	}
 	else if (size <= MAX_MED_SIZE)
 	{
-		if (alc_mng.med_plage == NULL)
+		if (g_alc_mng.med_plage == NULL)
 		{
-			alc_mng.med_plage = (t_plage*)ezmmap(page_size(true));
-			init_page(alc_mng.med_plage, MED_PAGE_SIZE, false);
+			g_alc_mng.med_plage = (t_plage*)ezmmap(MED_PAGE_SIZE);
+			init_page(g_alc_mng.med_plage, MED_PAGE_SIZE, false);
 		}
-		return (alc_mng.med_plage);
+		return (g_alc_mng.med_plage);
 	}
 	else
 	{
-		return (alc_mng.custom_plage);
+		return (g_alc_mng.custom_plage);
 	}
 }
 
@@ -333,15 +321,15 @@ void *special_custom_malloc(size_t size)
 	t_plage	*plagebrowse;
 	size_t	plagesize;
 
-	if (alc_mng.custom_plage == NULL) // if very first malloc on custom
+	if (g_alc_mng.custom_plage == NULL) // if very first malloc on custom
 	{
-		alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
-		init_page(alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
-		alc_mng.custom_plage->max_allowed_alloc = (void*) &alc_mng.custom_plage->data + size; 
-		return (&alc_mng.custom_plage->data + sizeof(void*));
+		g_alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size + sizeof(t_plage) + sizeof(void*)));
+		init_page(g_alc_mng.custom_plage, closestsize(size + sizeof(t_plage) + sizeof(void*)), true);
+		g_alc_mng.custom_plage->max_allowed_alloc = (void*) &g_alc_mng.custom_plage->data + size; 
+		return (&g_alc_mng.custom_plage->data + sizeof(void*));
 	}
 	plagesize = closestsize(size + sizeof(t_plage) + sizeof(void*));
-	plagebrowse = alc_mng.custom_plage;
+	plagebrowse = g_alc_mng.custom_plage;
 	while (plagebrowse->next)
 		plagebrowse = plagebrowse->next;
 	plagebrowse->next = (t_plage*)ezmmap(plagesize);
@@ -396,7 +384,7 @@ bool freecustomsizeptr(void *ptr)
 
 	if (ptr == NULL)
 		return (true);
-	if (alc_mng.custom_plage == NULL)
+	if (g_alc_mng.custom_plage == NULL)
 		return (false);
 	browse = find_cmalloc_in(ptr);
 	if (browse)
@@ -411,7 +399,7 @@ bool freecustomsizeptr(void *ptr)
 			else if (browse->next == NULL && browse->past) // nothing after
 				browse->past->next = NULL;
 			else // very first but something after it
-				alc_mng.custom_plage = browse->next;
+				g_alc_mng.custom_plage = browse->next;
 			munmap(browse, browse->size);
 			return (true);
 		}
@@ -457,10 +445,10 @@ void _free(void *ptr)
 			data.plage->past->next = NULL;
 		else if (data.plage->next)// very first but something after it
 		{
-			if (data.plage == alc_mng.small_plage)
-				alc_mng.small_plage = data.plage->next;
-			else if (data.plage == alc_mng.med_plage)
-				alc_mng.med_plage = data.plage->next;
+			if (data.plage == g_alc_mng.small_plage)
+				g_alc_mng.small_plage = data.plage->next;
+			else if (data.plage == g_alc_mng.med_plage)
+				g_alc_mng.med_plage = data.plage->next;
 		}
 		else // only plage of its category
 		{
@@ -498,8 +486,8 @@ void *_realloc(void *ptr, size_t size)
 	if (ptr == NULL)
 		return (NULL);
 	correctplage = checkpage(size);
-	if (correctplage == alc_mng.custom_plage || find_cmalloc_in(ptr))
-		return (special_custom_realloc(ptr, size,find_cmalloc_in(ptr) , correctplage == alc_mng.custom_plage ));
+	if (correctplage == g_alc_mng.custom_plage || find_cmalloc_in(ptr))
+		return (special_custom_realloc(ptr, size,find_cmalloc_in(ptr) , correctplage == g_alc_mng.custom_plage ));
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return (NULL);
@@ -546,8 +534,6 @@ void *_realloc(void *ptr, size_t size)
 		return (newmlc->data);
 	}
 }
-
-#include <stdlib.h>
 
 int main()
 {

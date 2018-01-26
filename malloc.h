@@ -17,8 +17,6 @@
 # include <unistd.h>
 # include <sys/mman.h>
 # include <stdbool.h>
-
-
 # define MAX_TINY_SIZE 	64
 # define TINY_PAGE_SIZE (4 * getpagesize())
 # define MAX_MED_SIZE 	1024
@@ -30,8 +28,8 @@ typedef struct			s_malloc
 {
 	struct s_malloc		*past;
 	struct s_malloc		*next;
-	void 				*end;
-	void 				*data;
+	void				*end;
+	void				*data;
 }						t_malloc;
 
 typedef struct			s_plage
@@ -51,12 +49,11 @@ typedef struct			s_cplage
 	void				*data;
 }						t_cplage;
 
-typedef struct 			s_retplgmlc
+typedef struct			s_retplgmlc
 {
-	t_plage 			*plage;
-	t_malloc 			*mlc;	
+	t_plage				*plage;
+	t_malloc			*mlc;
 }						t_retplgmlc;
-
 
 typedef struct			s_plage_mng
 {
@@ -65,6 +62,6 @@ typedef struct			s_plage_mng
 	t_plage				*custom_plage;
 }						t_plage_mng;
 
-t_plage_mng				alc_mng;
+t_plage_mng				g_alc_mng;
 
 #endif
