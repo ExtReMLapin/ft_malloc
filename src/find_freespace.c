@@ -61,19 +61,19 @@ static t_malloc	*find_freespace(t_plage *p, size_t w)
 	return (NULL);
 }
 
-static bool		find_free_space_plages_bool(t_plage *pb, size_t w, t_malloc *t)
+static t_malloc	*find_free_space_plages_bool(t_plage *pb, size_t w, t_malloc *t)
 {
 	while (pb)
 	{
 		t = find_freespace(pb, w);
 		if (t != NULL)
-			return (true);
+			return (t);
 		if (pb->next)
 			pb = pb->next;
 		else
-			return (false);
+			return (NULL);
 	}
-	return (false);
+	return (NULL);
 }
 
 t_malloc		*find_free_space_plages(t_plage *plage, size_t w)
@@ -86,7 +86,8 @@ t_malloc		*find_free_space_plages(t_plage *plage, size_t w)
 	if (plage == NULL || w == 0)
 		return (NULL);
 	p = plage;
-	found = find_free_space_plages_bool(p, w, target);
+	target = find_free_space_plages_bool(p, w, target);
+	found = target != NULL;
 	if (!found)
 	{
 		p->next = ezmmap(p->size);

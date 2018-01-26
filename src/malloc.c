@@ -23,8 +23,12 @@ void				*malloc(size_t size)
 	if (size == 0)
 		return (NULL);
 	target = checkpage(size);
+
 	if (target && target->custom == false)
+	{
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
+		printf("%p\n",adr );
+	}
 	else
 		return (special_custom_malloc(size));
 	if (adr != NULL)
@@ -66,13 +70,11 @@ int					main(void)
 	addr3 = (char*)realloc(addr1, 128 * M);
 	addr3[127 * M] = 42;
 	print(addr3);
-	malloc(1024);
-	malloc(42);
-	malloc(43);
-	malloc(1024 * 32);
-	malloc(1024 * 1024);
-	malloc(1024 * 1024 * 16);
-	malloc(1024 * 1024 * 128);
+
+	free(malloc(1024));
+	free(malloc(1024 * 1024));
+	free(malloc(1024 * 1024 * 16));
+	free(malloc(1024 * 1024 * 128));
 	show_alloc_mem();
 	return (0);
 }

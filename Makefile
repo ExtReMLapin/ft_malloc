@@ -14,8 +14,8 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-NAME = libft_malloc_$(HOSTTYPE).so
-LINK = libft_malloc.so
+NAME = libft_malloc_$(HOSTTYPE).a
+LINK = libft_malloc.a
 
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra

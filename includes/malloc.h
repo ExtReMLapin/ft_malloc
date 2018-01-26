@@ -17,6 +17,7 @@
 # include <sys/mman.h>
 # include <stdbool.h>
 # include <stdio.h>
+#include <string.h>
 # define MAX_TINY_SIZE 	64
 # define TINY_PAGE_SIZE (4 * getpagesize())
 # define MAX_MED_SIZE 	1024
