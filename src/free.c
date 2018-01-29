@@ -70,6 +70,7 @@ void			free(void *ptr)
 {
 	t_retplgmlc	data;
 
+	printf("%s\n", "FREE CALLED");
 	if (freecustomsizeptr(ptr))
 		return ;
 	data = find_mallocandplage(ptr);

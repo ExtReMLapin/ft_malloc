@@ -18,7 +18,7 @@ NAME = libft_malloc_$(HOSTTYPE).so
 LINK = libft_malloc.so
 
 CC = clang
-CFLAGS =  -Wall -Werror -Wextra
+CFLAGS =  -Wall -Werror -Wextra -g
 
 SRC_PATH = ./src
 SRC_NAME = find_freespace.c init.c utils.c find_malloc.c realloc.c utils2.c \
@@ -33,7 +33,7 @@ MAL = inc/malloc.h
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) -shared -o $(NAME) $(OBJ)   $(INC) 
+	@$(CC) $(CFLAGS) -shared -fvisibility=hidden -o $(NAME) $(OBJ)   $(INC) 
 	@ln -sf $(NAME) $(LINK)
 	@echo "\033[1;34mMalloc\t\t\033[1;33mCompilation\t\033[0;32m-OK-\033[0m"
 
