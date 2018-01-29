@@ -14,14 +14,15 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-NAME = libft_malloc_$(HOSTTYPE).a
-LINK = libft_malloc.a
+NAME = libft_malloc_$(HOSTTYPE).so
+LINK = libft_malloc.so
 
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+CC = clang
+CFLAGS =  -Wall -Werror -Wextra
 
 SRC_PATH = ./src
-SRC_NAME = find_freespace.c init.c utils.c find_malloc.c realloc.c utils2.c free.c malloc.c special_custom_realloc.c
+SRC_NAME = find_freespace.c init.c utils.c find_malloc.c realloc.c utils2.c \
+			free.c malloc.c special_custom_realloc.c
 
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))

@@ -13,7 +13,6 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-#define M (1024 * 1024)
 
 void				*malloc(size_t size)
 {
@@ -25,10 +24,7 @@ void				*malloc(size_t size)
 	target = checkpage(size);
 
 	if (target && target->custom == false)
-	{
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
-		printf("%p\n",adr );
-	}
 	else
 		return (special_custom_malloc(size));
 	if (adr != NULL)
@@ -52,29 +48,4 @@ void				*realloc(void *ptr, size_t size)
 	if (data.plage == NULL)
 		return (NULL);
 	return (reallocsub(&data, size, ptr, cp));
-}
-
-void				print(char *s)
-{
-	write(1, s, strlen(s));
-}
-
-int					main(void)
-{
-	char *addr1;
-	char *addr3;
-
-	addr1 = (char*)malloc(16 * M);
-	strcpy(addr1, "Bonjours\n");
-	print(addr1);
-	addr3 = (char*)realloc(addr1, 128 * M);
-	addr3[127 * M] = 42;
-	print(addr3);
-
-	free(malloc(1024));
-	free(malloc(1024 * 1024));
-	free(malloc(1024 * 1024 * 16));
-	free(malloc(1024 * 1024 * 128));
-	show_alloc_mem();
-	return (0);
 }
