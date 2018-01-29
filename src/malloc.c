@@ -6,7 +6,7 @@
 /*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/18 13:31:01 by pierre           ###   ########.fr       */
+/*   Updated: 2018/01/29 14:45:49 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 void				*malloc(size_t size)
 {
-	printf("%s\n", "MALLOC CALLED");
+	write(1, "MALLOC CALLED\n", 15);
 	t_plage		*target;
 	t_malloc	*adr;
 
@@ -35,7 +35,7 @@ void				*malloc(size_t size)
 
 void				*realloc(void *ptr, size_t size)
 {
-	write(1, "REALLOC CALLED", 15);
+	write(1, "REALLOC CALLED\n", 16);
 
 	t_retplgmlc	data;
 	t_plage		*cp;

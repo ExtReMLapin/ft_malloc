@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tvisenti <tvisenti@student.42.fr>          +#+  +:+       +#+         #
+#    By: pierre <pierre@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/09/14 10:52:08 by tvisenti          #+#    #+#              #
-#    Updated: 2017/10/09 17:05:34 by tvisenti         ###   ########.fr        #
+#    Updated: 2018/01/29 15:02:01 by pierre           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,8 +17,8 @@ endif
 NAME = libft_malloc_$(HOSTTYPE).so
 LINK = libft_malloc.so
 
-CC = clang
-CFLAGS =  -Wall -Werror -Wextra -g
+CC = gcc
+CFLAGS =  -Wall -Werror -Wextra
 
 SRC_PATH = ./src
 SRC_NAME = find_freespace.c init.c utils.c find_malloc.c realloc.c utils2.c \
@@ -33,7 +33,7 @@ MAL = inc/malloc.h
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) -shared -fvisibility=hidden -o $(NAME) $(OBJ)   $(INC) 
+	@$(CC) $(CFLAGS) -shared -o $(NAME) $(OBJ)   $(INC) 
 	@ln -sf $(NAME) $(LINK)
 	@echo "\033[1;34mMalloc\t\t\033[1;33mCompilation\t\033[0;32m-OK-\033[0m"
 

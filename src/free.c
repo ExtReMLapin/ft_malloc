@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pfichepo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:00 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/26 10:35:01 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/01/29 14:44:32 by pierre           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ void			free(void *ptr)
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return ;
+	ptr = NULL;
 	if (data.mlc->past == NULL && data.mlc->next == NULL)
 	{
 		if (free2(&data))
