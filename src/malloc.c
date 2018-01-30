@@ -42,7 +42,7 @@ void				*realloc(void *ptr, size_t size)
 	bool		icp;
 
 	if (ptr == NULL)
-		return (NULL);
+		return (malloc(size));
 	cp = checkpage(size);
 	icp = cp == g_alc_mng.custom_plage;
 	if (icp || find_cmalloc_in(ptr))
