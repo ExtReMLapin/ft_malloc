@@ -40,13 +40,9 @@ void		*special_custom_realloc(void *p, size_t s, t_plage *ic, bool goc)
 	if (ic && goc)
 	{
 		if (ic->size - (sizeof(t_plage) + sizeof(void*)) >= s)
-		{
-			//printf("%s\n", "yes");
 			return (p);
-		}
 		else
 		{
-			printf("%s %p \n","no", p );
 			page = malloc(s);
 			ft_memcpy(page , &ic->data + sizeof(void*),
 				mathmin(ic->max_allowed_alloc - (void*)&ic->data, s));

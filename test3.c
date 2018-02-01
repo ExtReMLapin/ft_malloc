@@ -23,7 +23,6 @@ int			main(void)
 
 	while (i < 15000)
 	{
-		//printf("%i\n", i);
 		dada = (char*)realloc(dada, sizeof(char)*i);
 		dada[0] = 'H';
 		dada[i-1] = '\0';

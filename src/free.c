@@ -27,11 +27,17 @@ static bool		freecustomsizeptr(void *ptr)
 		{
 			if (browse->next && browse->past)
 			{
+
 				browse->next->past = browse->past;
 				browse->past->next = browse->next;
 			}
 			else if (browse->next == NULL && browse->past)
 				browse->past->next = NULL;
+			else if (browse->next && browse->past == NULL)
+			{
+				browse->next->past = NULL;
+				g_alc_mng.custom_plage = browse->next;
+			}
 			else
 				g_alc_mng.custom_plage = browse->next;
 			munmap(browse, browse->size);

@@ -35,7 +35,7 @@ void				*malloc(size_t size)
 
 void				*realloc(void *ptr, size_t size)
 {
-	write(1, "REALLOC CALLED\n", 16);
+	//write(1, "REALLOC CALLED\n", 16);
 
 	t_retplgmlc	data;
 	t_plage		*cp;
