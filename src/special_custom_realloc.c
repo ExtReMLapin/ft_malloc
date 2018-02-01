@@ -17,7 +17,7 @@ static void	*special_custom_realloc01(size_t size, t_plage *incustom, void *ptr)
 	void			*mlc2;
 
 	mlc2 = malloc(size);
-	ft_memcpy(mlc2, &incustom->data + sizeof(void*),
+	ft_memcpy(mlc2, &incustom->data,
 		mathmin(incustom->size, size));
 	free(ptr);
 	return (mlc2);
@@ -27,7 +27,6 @@ static void	*special_custom_realloc02(void *ptr, size_t size)
 {
 	void			*mlc2;
 	t_retplgmlc		mlc;
-
 	mlc = find_mallocandplage(ptr);
 	mlc2 = malloc(size);
 	ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
@@ -45,7 +44,7 @@ void		*special_custom_realloc(void *p, size_t s, t_plage *ic, bool goc)
 		else
 		{
 			page = malloc(s);
-			ft_memcpy(page , &ic->data + sizeof(void*),
+			ft_memcpy(page , &ic->data,
 				mathmin(ic->max_allowed_alloc - (void*)&ic->data, s));
 			free(p);
 			return (page);
@@ -62,17 +61,16 @@ void		*special_custom_malloc(size_t size)
 	t_plage	*plagebrowse;
 	size_t	plagesize;
 
+	plagesize = closestsize(size + sizeof(t_plage) + sizeof(void*));
 	if (g_alc_mng.custom_plage == NULL)
 	{
-		g_alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(size
-			+ sizeof(t_plage) + sizeof(void*)));
-		init_page(g_alc_mng.custom_plage, closestsize(size +
-			sizeof(t_plage) + sizeof(void*)), true);
+		g_alc_mng.custom_plage = (t_plage*)ezmmap(closestsize(plagesize));
+		init_page(g_alc_mng.custom_plage, closestsize(plagesize), true);
 		g_alc_mng.custom_plage->max_allowed_alloc = (void*)
 		&g_alc_mng.custom_plage->data + size;
-		return (&g_alc_mng.custom_plage->data + sizeof(void*));
+		return (&g_alc_mng.custom_plage->data);
 	}
-	plagesize = closestsize(size + sizeof(t_plage) + sizeof(void*));
+
 	plagebrowse = g_alc_mng.custom_plage;
 	while (plagebrowse->next)
 		plagebrowse = plagebrowse->next;
@@ -81,5 +79,5 @@ void		*special_custom_malloc(size_t size)
 	plagebrowse->next->past = plagebrowse;
 	plagebrowse->next->max_allowed_alloc = (void*)&plagebrowse->next->data
 	+ size;
-	return (&plagebrowse->next->data + sizeof(void*));
+	return (&plagebrowse->next->data);
 }

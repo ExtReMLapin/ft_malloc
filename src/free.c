@@ -23,7 +23,7 @@ static bool		freecustomsizeptr(void *ptr)
 	browse = find_cmalloc_in(ptr);
 	if (browse)
 	{
-		if (&browse->data + sizeof(void*) == ptr)
+		if (&browse->data == ptr)
 		{
 			if (browse->next && browse->past)
 			{
@@ -70,13 +70,13 @@ void			free(void *ptr)
 {
 	t_retplgmlc	data;
 
-	printf("%s\n", "FREE CALLED");
+	write(1, "FREE CALLED\n", 13);
 	if (freecustomsizeptr(ptr))
 		return ;
+	write(1, "FREE CALLE2\n", 13);
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return ;
-	ptr = NULL;
 	if (data.mlc->past == NULL && data.mlc->next == NULL)
 	{
 		if (free2(&data))

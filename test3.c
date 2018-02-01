@@ -12,16 +12,26 @@
 
 #include "includes/malloc.h"
 
-#define M1 (1024 * 1024)
 
-void		print(char *s)
-{
-	write(1, s, strlen(s));
-}
 
 int			main(void)
 {
-	malloc(1);
-	printf("%s\n", "ahahah");
+	int i = 2050;
+
+	char *dada;
+
+	/*while (i < 9000)
+	{*/
+		dada = (char*)malloc(sizeof(char)*i);
+		dada = (char*)realloc(dada,i*2);
+		dada[0] = '4';
+		dada[i-1] = '\0';
+
+
+		i++;
+	//}
+
+
+
 	return (0);
 }
