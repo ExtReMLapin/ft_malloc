@@ -25,14 +25,9 @@ void				*malloc(size_t size)
 	target = checkpage(size);
 
 	if (target && target->custom == false)
-	{
-		printf("%s\n", "default");
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
-	}
 	else
-	{
 		return (special_custom_malloc(size));
-	}
 	if (adr != NULL)
 		return (adr->data);
 	return (NULL);

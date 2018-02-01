@@ -18,15 +18,15 @@ int			main(void)
 {
 	int i = 1; // not 0
 
-	char *dada = (char*)malloc(1);
+	char *dada;
 
-
-	while (i < 15000)
+	while (i < 9995)
 	{
-		//printf("%i\n", i);
-		dada = (char*)realloc(dada, sizeof(char)*i);
-		dada[0] = 'H';
-		dada[i-1] = '\0';
+		dada = (char*)malloc(sizeof(char)*i);
+		int i2 = 0;
+		while (i2 < i)
+			dada[i2++] = 'A';
+		dada[i2++] = '\0';
 		i++;
 	}
 

@@ -50,7 +50,7 @@ t_plage			*find_cmalloc_in(void *ptr)
 	browse = g_alc_mng.custom_plage;
 	while (browse)
 	{
-		if (&browse->data == ptr)
+		if (&browse->data + 1 == ptr)
 			return (browse);
 		if (browse->next)
 			browse = browse->next;
