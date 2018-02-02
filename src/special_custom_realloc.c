@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   special_custom_realloc.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:33:55 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/29 14:39:42 by pierre           ###   ########.fr       */
+/*   Updated: 2018/02/02 11:12:55 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ void		*special_custom_realloc(void *p, size_t s, t_plage *ic, bool goc)
 		else
 		{
 			page = malloc(s);
-			ft_memcpy(page , &ic->data + sizeof(void*),
-				mathmin(ic->max_allowed_alloc - (void*)&ic->data, s));
+			ft_memcpy(page , &ic->data + 1,
+				mathmin(ic->max_allowed_alloc - ((void*)&ic->data+1), s));
 			free(p);
 			return (page);
 		}

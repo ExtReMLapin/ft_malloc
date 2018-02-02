@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/02/02 10:51:40 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 11:13:26 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ static bool eq(char *str, char* str2) // on check == des 2 strings, s'arrete a l
 	}
 	return (true);
 }
-
 
 
 int main()
