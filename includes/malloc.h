@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   malloc.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:49:33 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/18 11:22:54 by pierre           ###   ########.fr       */
+/*   Updated: 2018/02/02 10:02:12 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,5 @@ t_plage					*checkpage(size_t size);
 void					free(void *ptr);
 void					*malloc(size_t size);
 void 					*realloc(void *ptr, size_t size);
+void					*calloc(size_t nmemb, size_t size);
 #endif

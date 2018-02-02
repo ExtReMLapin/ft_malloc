@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   malloc.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/29 14:45:49 by pierre           ###   ########.fr       */
+/*   Updated: 2018/02/02 10:03:56 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 void				*malloc(size_t size)
 {
+	//printf( "MALLOC CALLED %lu\n", size);
 	write(1, "MALLOC CALLED\n", 15);
 	t_plage		*target;
 	t_malloc	*adr;
@@ -35,8 +36,8 @@ void				*malloc(size_t size)
 
 void				*realloc(void *ptr, size_t size)
 {
-	//write(1, "REALLOC CALLED\n", 16);
-
+	//printf( "REALLOC CALLED %p %lu \n",ptr,  size);
+	write(1, "REALLOC CALLED\n", 16);
 	t_retplgmlc	data;
 	t_plage		*cp;
 	bool		icp;
@@ -51,4 +52,24 @@ void				*realloc(void *ptr, size_t size)
 	if (data.plage == NULL)
 		return (NULL);
 	return (reallocsub(&data, size, ptr, cp));
+}
+
+
+
+void				*calloc(size_t nmemb, size_t size)
+{
+		write(1, "CALLOC CALLED\n", 15);
+
+	unsigned char	*ptr;
+	size_t			idx;
+
+	if ((ptr = malloc(size * nmemb)) == NULL)
+		return (NULL);
+	idx = 0;
+	while (idx < size)
+	{
+		ptr[idx] = 0;
+		++idx;
+	}
+	return (ptr);
 }

@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/02/01 12:49:57 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 09:56:19 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 
 
-static void fill(char *str, size_t size)
+static void fill(char *str, size_t size) // on remplis la string de char de la table ascii, pas que le meme pour detecter le decalage possible
 {
 	size_t i = 0;
 	while (i < size)
@@ -26,7 +26,7 @@ static void fill(char *str, size_t size)
 }
 
 
-static bool eq(char *str, char* str2)
+static bool eq(char *str, char* str2) // on check la string, compatibilité avec taille diff, s'arrete a la fin de la plus petite string
 {
 	int i = 0;
 
@@ -44,33 +44,20 @@ static bool eq(char *str, char* str2)
 int main()
 {
 
+	char *orgin = (char*)ezmmap(15001);
+
+	fill(orgin, 15000);
 
 	int i = 0;
 
-	while (i < 8000)
+	while (i < 15000)
 	{
 		char *str = (char*)malloc(sizeof(char)*(i+1));
 		fill(str,i);
-		char *str2 = (char*)malloc(sizeof(char)*(i+50));
-		fill(str2,i+49);
-		if (eq(str, str2) == false)
+		if (eq(str, orgin) == false)
 			printf("%s\n", "reeeeee");
 		i++;
 	}
-	printf("%s\n", "phase 1 done");
+	printf("%s\n", " done");
 
-	i = 0;
-
-	while (i < 8000)
-	{
-		char *str = (char*)malloc(sizeof(char)*(i+1));
-		char *str2 = (char*)malloc(sizeof(char)*(i+50));
-		fill(str2,i+49);
-		fill(str,i);
-		if (eq(str, str2) == false)
-			printf("%s\n", "reeeeee");
-		i++;
-	}
-
-	printf("%s\n", "phase 2 done");
 }
