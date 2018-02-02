@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/02 10:03:56 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 10:53:11 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,12 @@
 
 void				*malloc(size_t size)
 {
-	//printf( "MALLOC CALLED %lu\n", size);
-	write(1, "MALLOC CALLED\n", 15);
 	t_plage		*target;
 	t_malloc	*adr;
 
 	if (size == 0)
 		return (NULL);
 	target = checkpage(size);
-
 	if (target && target->custom == false)
 		adr = find_free_space_plages(target, size + sizeof(t_malloc));
 	else
@@ -36,8 +33,6 @@ void				*malloc(size_t size)
 
 void				*realloc(void *ptr, size_t size)
 {
-	//printf( "REALLOC CALLED %p %lu \n",ptr,  size);
-	write(1, "REALLOC CALLED\n", 16);
 	t_retplgmlc	data;
 	t_plage		*cp;
 	bool		icp;
@@ -58,8 +53,6 @@ void				*realloc(void *ptr, size_t size)
 
 void				*calloc(size_t nmemb, size_t size)
 {
-		write(1, "CALLOC CALLED\n", 15);
-
 	unsigned char	*ptr;
 	size_t			idx;
 

@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/02/02 09:56:19 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 10:51:40 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static void fill(char *str, size_t size) // on remplis la string de char de la t
 }
 
 
-static bool eq(char *str, char* str2) // on check la string, compatibilité avec taille diff, s'arrete a la fin de la plus petite string
+static bool eq(char *str, char* str2) // on check == des 2 strings, s'arrete a la fin de la plus petite string
 {
 	int i = 0;
 

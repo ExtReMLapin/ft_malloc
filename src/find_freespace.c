@@ -3,34 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   find_freespace.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pfichepo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:32:12 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/26 10:32:14 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 10:51:31 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc.h>
-
-static t_malloc	*find_freespacewhile(t_malloc *mlc, size_t w)
-{
-	t_malloc	*tmp;
-
-	while (mlc && mlc->next)
-	{
-		if ((size_t)((void*)mlc->next - (mlc->end + sizeof(void*))) > w)
-		{
-			tmp = mlc->end + sizeof(void*);
-			init_malloc(tmp, w - sizeof(t_malloc));
-			tmp->next = mlc->next;
-			tmp->next->past = tmp;
-			mlc->next = tmp;
-			return (tmp);
-		}
-		mlc = mlc->next;
-	}
-	return (NULL);
-}
 
 static t_malloc	*find_freespace(t_plage *p, size_t w)
 {
@@ -47,9 +27,19 @@ static t_malloc	*find_freespace(t_plage *p, size_t w)
 		return (tmp);
 	}
 	curmalloc = p->data;
-	tmp = find_freespacewhile(curmalloc, w);
-	if (tmp != NULL)
-		return (tmp);
+	while (curmalloc && curmalloc->next)
+	{
+		if ((size_t)((void*)curmalloc->next - (curmalloc->end + sizeof(void*))) > w)
+		{
+			tmp = curmalloc->end + sizeof(void*);
+			init_malloc(tmp, w - sizeof(t_malloc));
+			tmp->next = curmalloc->next;
+			tmp->next->past = tmp;
+			curmalloc->next = tmp;
+			return (tmp);
+		}
+		curmalloc = curmalloc->next;
+	}
 	if ((curmalloc->end + sizeof(void*) + w) < p->max_allowed_alloc)
 	{
 		tmp = curmalloc->end + sizeof(void*);
