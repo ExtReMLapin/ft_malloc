@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test3.c                                            :+:      :+:    :+:   */
+/*   test2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pierre <pierre@student.42.fr>              +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/01/29 15:03:45 by pierre           ###   ########.fr       */
+/*   Updated: 2018/02/05 12:04:07 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,17 @@ int			main(void)
 
 	char *dada;
 
-	while (i < 9995)
+	while (i < 6000)
 	{
 		dada = (char*)malloc(sizeof(char)*i);
 		int i2 = 0;
 		while (i2 < i)
 			dada[i2++] = 'A';
 		dada[i2++] = '\0';
-		free(dada);
+
 		i++;
 	}
-
+	show_alloc_mem();
+	printf("%s\n", "reee");
 	return (0);
 }

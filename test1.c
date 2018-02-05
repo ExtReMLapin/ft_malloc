@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/02/02 11:42:03 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 12:10:35 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,35 +40,18 @@ static bool eq(char *str, char* str2) // on check == des 2 strings, s'arrete a l
 
 int			main(void)
 {
-	write(1, "in\n",3);
 	int i = 0; // not 0
 
 
-
-	char **table = (char**)ezmmap(1500001); // osef de la taille, faut juste de l'espace
-
-	char *orgin = (char*)ezmmap(1024);
-
-	fill(orgin, 1023);
-
-
-	while (i < 1024)
+	while (i < 39)
 	{
-		table[i] =  (char*)malloc(1024);
-		fill(table[i], 1023);
+		malloc(1024);
+		printf("%i\n",i );
 		i++;
 	}
 
-	i = 0;
 
-	while (i < 1024)
-	{
-		if (! eq(table[i], orgin))
-			printf("%s\n","reeeee" );
-		i++;
-	}
-
-	printf("%s \n", "okay for size 1024");
+	show_alloc_mem();
 
 	return (0);
 }
