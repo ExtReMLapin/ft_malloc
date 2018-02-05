@@ -6,15 +6,28 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:32:12 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/02 10:51:31 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:43:17 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc.h>
 
+t_malloc *dothing(t_malloc **tmp1, t_malloc *cmlc, size_t w)
+{
+	t_malloc *tmp;
+
+	tmp = *tmp1;
+	tmp = cmlc->end + sizeof(void*);
+	init_malloc(tmp, w - sizeof(t_malloc));
+	tmp->next = cmlc->next;
+	tmp->next->past = tmp;
+	cmlc->next = tmp;
+	return (tmp);
+}
+
 static t_malloc	*find_freespace(t_plage *p, size_t w)
 {
-	t_malloc *curmalloc;
+	t_malloc *cmlc;
 	t_malloc *tmp;
 
 	if (p == NULL || w > p->size || w == 0)
@@ -26,25 +39,18 @@ static t_malloc	*find_freespace(t_plage *p, size_t w)
 		tmp->past = NULL;
 		return (tmp);
 	}
-	curmalloc = p->data;
-	while (curmalloc && curmalloc->next)
+	cmlc = p->data;
+	while (cmlc && cmlc->next)
 	{
-		if ((size_t)((void*)curmalloc->next - (curmalloc->end + sizeof(void*))) > w)
-		{
-			tmp = curmalloc->end + sizeof(void*);
-			init_malloc(tmp, w - sizeof(t_malloc));
-			tmp->next = curmalloc->next;
-			tmp->next->past = tmp;
-			curmalloc->next = tmp;
-			return (tmp);
-		}
-		curmalloc = curmalloc->next;
+		if ((size_t)((void*)cmlc->next - (cmlc->end + sizeof(void*))) > w)
+			return (dothing(&tmp, cmlc, w));
+		cmlc = cmlc->next;
 	}
-	if ((curmalloc->end + sizeof(void*) + w) < p->max_allowed_alloc)
+	if ((cmlc->end + sizeof(void*) + w) < p->max_allowed_alloc)
 	{
-		tmp = curmalloc->end + sizeof(void*);
-		curmalloc->next = tmp;
-		tmp->past = curmalloc;
+		tmp = cmlc->end + sizeof(void*);
+		cmlc->next = tmp;
+		tmp->past = cmlc;
 		init_malloc(tmp, w - sizeof(t_malloc));
 		return (tmp);
 	}

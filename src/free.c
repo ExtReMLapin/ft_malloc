@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:00 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:04:13 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:23:20 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,11 @@
 
 static bool		freecustomsizeptr(void *ptr)
 {
-	t_plage	*browse;
+	t_plage		*browse;
 
-	if (ptr == NULL)
-		return (true);
-	if (g_alc_mng.custom_plage == NULL)
-		return (false);
-	browse = find_cmalloc_in(ptr);
-	if (browse)
+	if (ptr == NULL || g_alc_mng.custom_plage == NULL)
+		return (ptr == NULL);
+	if ((browse = find_cmalloc_in(ptr)))
 	{
 		if (&browse->data + 1 == ptr)
 		{
@@ -77,7 +74,6 @@ void			free(void *ptr)
 
 	if (freecustomsizeptr(ptr))
 		return ;
-	
 	data = find_mallocandplage(ptr);
 	if (data.plage == NULL)
 		return ;

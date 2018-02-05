@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:32 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:01:27 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:49:52 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ t_plage				*checkpage(size_t size)
 	{
 		if (g_alc_mng.med_plage == NULL)
 		{
-			g_alc_mng.med_plage = (t_plage*)ezmmap(12 * getpagesize());
-			init_page(g_alc_mng.med_plage, 12 * getpagesize(), false);
+			g_alc_mng.med_plage = (t_plage*)ezmmap(5 * getpagesize());
+			init_page(g_alc_mng.med_plage, 5 * getpagesize(), false);
 		}
 		return (g_alc_mng.med_plage);
 	}
