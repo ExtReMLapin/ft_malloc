@@ -6,13 +6,13 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:32:12 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:43:17 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:52:24 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc.h>
 
-t_malloc *dothing(t_malloc **tmp1, t_malloc *cmlc, size_t w)
+static t_malloc	*dothing(t_malloc **tmp1, t_malloc *cmlc, size_t w)
 {
 	t_malloc *tmp;
 
@@ -22,6 +22,18 @@ t_malloc *dothing(t_malloc **tmp1, t_malloc *cmlc, size_t w)
 	tmp->next = cmlc->next;
 	tmp->next->past = tmp;
 	cmlc->next = tmp;
+	return (tmp);
+}
+
+static t_malloc	*dothing2(t_malloc **tmp1, t_malloc *cmlc, size_t w)
+{
+	t_malloc *tmp;
+
+	tmp = *tmp1;
+	tmp = cmlc->end + sizeof(void*);
+	cmlc->next = tmp;
+	tmp->past = cmlc;
+	init_malloc(tmp, w - sizeof(t_malloc));
 	return (tmp);
 }
 
@@ -47,13 +59,7 @@ static t_malloc	*find_freespace(t_plage *p, size_t w)
 		cmlc = cmlc->next;
 	}
 	if ((cmlc->end + sizeof(void*) + w) < p->max_allowed_alloc)
-	{
-		tmp = cmlc->end + sizeof(void*);
-		cmlc->next = tmp;
-		tmp->past = cmlc;
-		init_malloc(tmp, w - sizeof(t_malloc));
-		return (tmp);
-	}
+		return (dothing2(&tmp, cmlc, w));
 	return (NULL);
 }
 

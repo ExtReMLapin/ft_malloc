@@ -6,11 +6,20 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:00 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:23:20 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 11:42:27 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc.h>
+
+static void		invert(t_plage **browse1)
+{
+	t_plage *browse;
+
+	browse = *browse1;
+	browse->next->past = browse->past;
+	browse->past->next = browse->next;
+}
 
 static bool		freecustomsizeptr(void *ptr)
 {
@@ -23,19 +32,15 @@ static bool		freecustomsizeptr(void *ptr)
 		if (&browse->data + 1 == ptr)
 		{
 			if (browse->next && browse->past)
-			{
-				browse->next->past = browse->past;
-				browse->past->next = browse->next;
-			}
+				invert(&browse);
 			else if (browse->next == NULL && browse->past)
 				browse->past->next = NULL;
-			else if (browse->next && browse->past == NULL)
+			else
 			{
-				browse->next->past = NULL;
+				if (browse->next && browse->past == NULL)
+					browse->next->past = NULL;
 				g_alc_mng.custom_plage = browse->next;
 			}
-			else
-				g_alc_mng.custom_plage = browse->next;
 			munmap(browse, browse->size);
 			return (true);
 		}

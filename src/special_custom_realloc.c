@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:33:55 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:05:55 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:58:52 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void		*special_custom_malloc(size_t size)
 		&g_alc_mng.custom_plage->data + size + 1;
 		return (&g_alc_mng.custom_plage->data + 1);
 	}
-
 	plagebrowse = g_alc_mng.custom_plage;
 	while (plagebrowse->next)
 		plagebrowse = plagebrowse->next;
