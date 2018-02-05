@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/09/08 14:49:06 by byoung-w          #+#    #+#             */
-/*   Updated: 2018/02/02 10:39:55 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/02 11:42:03 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int			main(void)
 
 
 
-	char **table = (char**)ezmmap(1500001);
+	char **table = (char**)ezmmap(1500001); // osef de la taille, faut juste de l'espace
 
 	char *orgin = (char*)ezmmap(1024);
 

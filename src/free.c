@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:00 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/02 10:53:20 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:04:13 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ static bool		freecustomsizeptr(void *ptr)
 		{
 			if (browse->next && browse->past)
 			{
-
 				browse->next->past = browse->past;
 				browse->past->next = browse->next;
 			}

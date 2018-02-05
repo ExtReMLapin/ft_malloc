@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pfichepo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:35:32 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/01/26 10:35:33 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:01:27 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ t_plage				*checkpage(size_t size)
 	{
 		if (g_alc_mng.small_plage == NULL)
 		{
-			g_alc_mng.small_plage = (t_plage*)ezmmap(TINY_PAGE_SIZE);
-			init_page(g_alc_mng.small_plage, TINY_PAGE_SIZE, false);
+			g_alc_mng.small_plage = (t_plage*)ezmmap(4 * getpagesize());
+			init_page(g_alc_mng.small_plage, 4 * getpagesize(), false);
 		}
 		return (g_alc_mng.small_plage);
 	}
@@ -76,8 +76,8 @@ t_plage				*checkpage(size_t size)
 	{
 		if (g_alc_mng.med_plage == NULL)
 		{
-			g_alc_mng.med_plage = (t_plage*)ezmmap(MED_PAGE_SIZE);
-			init_page(g_alc_mng.med_plage, MED_PAGE_SIZE, false);
+			g_alc_mng.med_plage = (t_plage*)ezmmap(12 * getpagesize());
+			init_page(g_alc_mng.med_plage, 12 * getpagesize(), false);
 		}
 		return (g_alc_mng.med_plage);
 	}

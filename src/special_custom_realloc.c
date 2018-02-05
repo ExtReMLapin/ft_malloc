@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:33:55 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/02 11:12:55 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:05:55 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static void	*special_custom_realloc02(void *ptr, size_t size)
 {
 	void			*mlc2;
 	t_retplgmlc		mlc;
+
 	mlc = find_mallocandplage(ptr);
 	mlc2 = malloc(size);
 	ft_memcpy(mlc2, ptr, mathmin(mlc.mlc->end - mlc.mlc->data, size));
@@ -44,8 +45,8 @@ void		*special_custom_realloc(void *p, size_t s, t_plage *ic, bool goc)
 		else
 		{
 			page = malloc(s);
-			ft_memcpy(page , &ic->data + 1,
-				mathmin(ic->max_allowed_alloc - ((void*)&ic->data+1), s));
+			ft_memcpy(page, &ic->data + 1,
+				mathmin(ic->max_allowed_alloc - ((void*)&ic->data + 1), s));
 			free(p);
 			return (page);
 		}

@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/02 10:53:11 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/05 10:03:54 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,6 @@ void				*realloc(void *ptr, size_t size)
 		return (NULL);
 	return (reallocsub(&data, size, ptr, cp));
 }
-
-
 
 void				*calloc(size_t nmemb, size_t size)
 {
