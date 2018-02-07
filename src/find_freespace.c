@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/26 10:32:12 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 12:46:25 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/07 11:03:18 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,8 @@ static t_malloc	*find_freespace(t_plage *p, size_t w)
 	return (NULL);
 }
 
-static t_malloc	*find_free_space_plages_bool(t_plage **pb, size_t w, t_malloc *t)
+static t_malloc	*find_space_plages_bool(t_plage **pb, size_t w, t_malloc *t)
 {
-
-
 	while (*pb)
 	{
 		t = find_freespace(*pb, w);
@@ -90,7 +88,7 @@ t_malloc		*find_free_space_plages(t_plage *plage, size_t w)
 	if (plage == NULL || w == 0)
 		return (NULL);
 	p = plage;
-	target = find_free_space_plages_bool(&p, w, target);
+	target = find_space_plages_bool(&p, w, target);
 	found = target != NULL;
 	if (!found)
 	{

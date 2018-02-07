@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:59:14 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/05 10:03:54 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/07 10:46:49 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,4 @@ void				*realloc(void *ptr, size_t size)
 	if (data.plage == NULL)
 		return (NULL);
 	return (reallocsub(&data, size, ptr, cp));
-}
-
-void				*calloc(size_t nmemb, size_t size)
-{
-	unsigned char	*ptr;
-	size_t			idx;
-
-	if ((ptr = malloc(size * nmemb)) == NULL)
-		return (NULL);
-	idx = 0;
-	while (idx < size)
-	{
-		ptr[idx] = 0;
-		++idx;
-	}
-	return (ptr);
 }
