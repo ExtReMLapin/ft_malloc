@@ -6,7 +6,7 @@
 #    By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/01/28 13:26:56 by pfichepo          #+#    #+#              #
-#    Updated: 2018/02/07 11:24:03 by pfichepo         ###   ########.fr        #
+#    Updated: 2018/02/07 11:43:24 by pfichepo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,9 +49,4 @@ fclean: clean
 
 re: fclean all
 
-norme:
-	@cd libft && make norme
-	@echo "\033[1;34mMalloc\t\t\033[1;33mNorminette\t\033[0;32m-OK-\033[0m"
-	@norminette $(SRC) $(MAL)
-
-.PHONY: fclean all clean re norme
+.PHONY: fclean all clean re
