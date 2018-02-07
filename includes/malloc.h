@@ -6,7 +6,7 @@
 /*   By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/14 10:49:33 by pfichepo          #+#    #+#             */
-/*   Updated: 2018/02/07 10:46:17 by pfichepo         ###   ########.fr       */
+/*   Updated: 2018/02/07 12:53:05 by pfichepo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,8 @@
 # include <sys/mman.h>
 # include <stdbool.h>
 # include <stdio.h>
-# include <string.h>
 # define MAX_TINY_SIZE 	64
 # define MAX_MED_SIZE 	1024
-# define MED_PAGE_SIZE 	(12 * getpagesize())
 # define PROT			PROT_READ | PROT_WRITE
 # define MAP			MAP_ANON | MAP_PRIVATE
 
@@ -78,4 +76,7 @@ t_plage					*checkpage(size_t size);
 void					free(void *ptr);
 void					*malloc(size_t size);
 void					*realloc(void *ptr, size_t size);
+void					ft_putstr(char *str);
+void					print_hex(unsigned int hex);
+void					ft_putnbr(int nb);
 #endif

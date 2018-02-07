@@ -6,7 +6,7 @@
 #    By: pfichepo <pfichepo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/01/28 13:26:56 by pfichepo          #+#    #+#              #
-#    Updated: 2018/02/07 11:43:24 by pfichepo         ###   ########.fr        #
+#    Updated: 2018/02/07 12:30:14 by pfichepo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ CFLAGS =  -Wall -Werror -Wextra
 
 SRC_PATH = ./src
 SRC_NAME = find_freespace.c init.c utils.c find_malloc.c realloc.c utils2.c \
-			free.c malloc.c special_custom_realloc.c
+			free.c malloc.c special_custom_realloc.c libft.c
 
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))
