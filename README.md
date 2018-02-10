@@ -3,6 +3,8 @@
 
 First project working with low-level access to the memory, handeling the malloc function myself, preventing any fragmentation by filling ram "holes" after data was freed
 
+code looks like shit because we are supposed to follow retarded rules at school (less than 25 lines funcs ets, fkin bullshit)
+
 
 ignoring laws of physic since 2018
 
