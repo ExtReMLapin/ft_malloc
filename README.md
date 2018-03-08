@@ -6,6 +6,13 @@ First project working with low-level access to the memory, handeling the malloc 
 code looks like shit because we are supposed to follow retarded rules at school (less than 25 lines funcs ets, fkin bullshit)
 
 
+Things to fix :
+
+mallocs are not on a %16 alignement on macos, which is required to speedup the cpu malloc read thing, but working fine on linux.
+	
+Not making checksum of the malloc structs to check of some tard' is writing over my malloc structs, im lazy so fuck off
+
+
 ignoring laws of physic since 2018
 
 ![](https://puu.sh/z8yW6/db4c4ae49e.png)
