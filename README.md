@@ -8,9 +8,9 @@ code looks like shit because we are supposed to follow retarded rules at school 
 
 Things to fix :
 
-mallocs are not on a %16 alignement on macos, which is required to speedup the cpu malloc read thing, but working fine on linux.
+mallocs are not on a %16 alignement on macos, which is required to speedup the cpu malloc read thing and crash on macos because of used SIMD instructions, but working fine on ubuntu.
 	
-Not making checksum of the malloc structs to check of some tard' is writing over my malloc structs, im lazy so fuck off
+Not making checksum of the malloc structs to check of some tard' is writing over my malloc structs.
 
 
 ignoring laws of physic since 2018
